@@ -1,6 +1,6 @@
-# OtherLanguage_Tools
+# TOols
 
-这是当前的总工具库入口，用于按用途收纳不同类型的仓库内容。
+这是当前的总工具库入口，用于按用途收纳不同类型的仓库内容。仓库原名为 OtherLanguage_Tools。
 
 ## 当前结构
 
