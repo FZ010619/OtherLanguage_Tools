@@ -11,9 +11,9 @@
 
 ## 说明
 
-- `userscript_Tools`：放浏览器脚本、油猴脚本等。
-- `python_Tools`：放 Python 小工具。
-- `exe_Tools`：放独立可执行程序、安装包、相关说明。
-- `archive_实验`：放实验项目、教学项目、归档内容。
+- `userscript_Tools`：放浏览器脚本、油猴脚本等，当前包含 bilibili-feed-cleaner。
+- `python_Tools`：放 Python 小工具，当前包含 Python_Tools 和 Life_tOOls。
+- `exe_Tools`：放独立可执行程序、安装包、相关说明，当前包含 Canon_Clean_software。
+- `archive_实验`：放实验项目、教学项目、归档内容，当前包含 exp_6 和 desktop-tutorial。
 
 `FZ010619.github.io` 保持为单独仓库，不并入本库。

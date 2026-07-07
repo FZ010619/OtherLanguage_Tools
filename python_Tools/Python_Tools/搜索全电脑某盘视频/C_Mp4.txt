@@ -1,0 +1,458 @@
+ 驱动器 C 中的卷没有标签。
+ 卷的序列号是 FFF9-396C
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\Guide\Content\Images\CopilotWalkthrough 的目录
+
+2026/03/07  17:33           329,288 2Walkthrough_2_1_AskGeneralQuestion-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33         1,055,708 2Walkthrough_2_2_SlashReferences-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33            63,734 2Walkthrough_2_3_OpenChat-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33           107,735 2Walkthrough_Exception_Analysis-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33            40,583 Walkthrough_1_1_SignIn.mp4
+2026/03/07  17:33           769,192 Walkthrough_2_1_AskGeneralQuestion.mp4
+2026/03/07  17:33           683,910 Walkthrough_2_2_SlashandReferences.mp4
+2026/03/07  17:33           429,396 Walkthrough_3_1_InlineExample-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33           429,396 Walkthrough_3_1_InlineExample.mp4
+2026/03/07  17:33           519,105 Walkthrough_4_1_Context.mp4
+2026/03/07  17:33           457,796 Walkthrough_AutoRename-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33           457,796 Walkthrough_AutoRename.mp4
+2026/03/07  17:33           501,222 Walkthrough_Completions.mp4
+2026/03/07  17:33           108,216 Walkthrough_ExceptionAnalysis.mp4
+2026/03/07  17:33           503,793 Walkthrough_GenerateGitCommitMessages-ezgif.com-gif-to-mp4-converter.mp4
+2026/03/07  17:33           503,793 Walkthrough_GenerateGitCommitMessages.mp4
+              16 个文件      6,960,663 字节
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\Guide\Content\Images\Welcome 的目录
+
+2026/03/07  17:33           534,851 Welcome.NewProject.mp4
+2026/03/07  17:33           821,032 Welcome.Search.mp4
+2026/03/07  17:33           300,592 Welcome.Themes.mp4
+2026/03/07  17:33         1,350,105 Welcome.WindowLayout.mp4
+               4 个文件      3,006,580 字节
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\Guide\Content\Images\Welcome.Cpp 的目录
+
+2026/03/07  17:33           501,080 Welcome.Cpp.Editing.Intellisense.mp4
+2026/03/07  17:33           776,584 Welcome.Cpp.QuickActions.mp4
+               2 个文件      1,277,664 字节
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\Guide\Content\Images\Welcome.CSharp 的目录
+
+2026/03/07  17:33           443,589 Welcome.CSharp.Editing.mp4
+2026/03/07  17:33           827,816 Welcome.CSharp.QuickActions.mp4
+               2 个文件      1,271,405 字节
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\Guide\Content\Images\Welcome.Python 的目录
+
+2026/03/07  17:33           364,647 Welcome.Python.Editing.Intellisense.mp4
+2026/03/07  17:33           417,454 Welcome.Python.QuickActions.Refactoring.mp4
+               2 个文件        782,101 字节
+
+ C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\IDE\CommonExtensions\Platform\WhatsNew\Content\media 的目录
+
+2026/03/07  17:33         1,499,505 call-stack-analysis.mp4
+2026/03/07  17:33         5,794,032 ClickToAccept.mp4
+2026/03/07  17:33           397,858 ienumerable-visualizer-data-tips.mp4
+2026/03/07  17:33        17,448,744 markdowncontrols.mp4
+               4 个文件     25,140,139 字节
+
+ C:\ProgramData\OriginLab\98\Localization\C\Videos 的目录
+
+2019/10/17  23:29         8,408,631 Analysis with Auto Recalculations.mp4
+2019/10/21  02:35        13,379,333 Bringing Data into Origin.mp4
+2019/10/18  02:02         7,810,876 Cluster Analysis in OriginPro.mp4
+2019/10/21  03:08         9,957,196 Creating Statistical Graphs.mp4
+2019/10/21  02:44        18,234,995 Getting Started with Graphing.mp4
+               5 个文件     57,791,031 字节
+
+ C:\ProgramData\OriginLab\98\Localization\E\Videos 的目录
+
+2019/10/15  08:50         9,989,641 Analysis with Auto Recalculations.mp4
+2019/10/08  12:17        13,312,264 Bringing Data into Origin.mp4
+2019/10/18  08:57         8,604,888 Cluster Analysis in OriginPro.mp4
+2019/10/18  08:58         9,519,758 Creating Statistical Graphs.mp4
+2019/10/09  10:16        23,805,853 Getting Started with Graphing.mp4
+2019/10/22  10:32        18,984,194 US Zip Code Density Map.mp4
+               6 个文件     84,216,598 字节
+
+ C:\Users\All Users\OriginLab\98\Localization\C\Videos 的目录
+
+2019/10/17  23:29         8,408,631 Analysis with Auto Recalculations.mp4
+2019/10/21  02:35        13,379,333 Bringing Data into Origin.mp4
+2019/10/18  02:02         7,810,876 Cluster Analysis in OriginPro.mp4
+2019/10/21  03:08         9,957,196 Creating Statistical Graphs.mp4
+2019/10/21  02:44        18,234,995 Getting Started with Graphing.mp4
+               5 个文件     57,791,031 字节
+
+ C:\Users\All Users\OriginLab\98\Localization\E\Videos 的目录
+
+2019/10/15  08:50         9,989,641 Analysis with Auto Recalculations.mp4
+2019/10/08  12:17        13,312,264 Bringing Data into Origin.mp4
+2019/10/18  08:57         8,604,888 Cluster Analysis in OriginPro.mp4
+2019/10/18  08:58         9,519,758 Creating Statistical Graphs.mp4
+2019/10/09  10:16        23,805,853 Getting Started with Graphing.mp4
+2019/10/22  10:32        18,984,194 US Zip Code Density Map.mp4
+               6 个文件     84,216,598 字节
+
+ C:\Users\Zhen\AppData\Local\Microsoft\Edge\User Data\Default\Extensions\pdffkfellgipmhklpdmokmckkkfcopbh\5.4.3.1_0\web-accessible-resources\redirects 的目录
+
+2026/05/14  16:40             3,753 noopmp4.mp4
+               1 个文件          3,753 字节
+
+ C:\Users\Zhen\AppData\Local\Temp 的目录
+
+2026/05/29  12:01            44,331 test_h264_nvenc.mp4
+2026/05/29  12:01                 0 test_h264_nvenc_out.mp4
+2026/05/29  12:01            44,331 test_h264_qsv.mp4
+               3 个文件         88,662 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\cache\2026-01\Sns\Video\18 的目录
+
+2026/01/01  17:21           728,446 36e7571a7fb9f3b55b83ff910b80b2.mp4
+               1 个文件        728,446 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\cache\2026-01\Sns\Video\ba 的目录
+
+2026/01/01  11:42         2,177,798 2691b92c7df9d2a759af362d53bf5f.mp4
+               1 个文件      2,177,798 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\attach\4e9baec6d38c93b0fc04f8dcc4c882e5\2025-03\Rec\c620169694aefafd\V 的目录
+
+2025/12/31  21:57         1,403,184 1.mp4
+2025/12/31  21:57         4,648,448 2.mp4
+               2 个文件      6,051,632 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\attach\5a6b2868eb0e76dc74e8044b46a3f4b3\2024-04\Rec\b15f10873db97200\V 的目录
+
+2025/12/31  21:19           712,816 2.mp4
+2025/12/31  21:19         2,308,608 3.mp4
+               2 个文件      3,021,424 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\file\2025-03 的目录
+
+2025/12/31  21:25        14,256,288 2023061623104400-CC47F0DEC75C1FD3B1F95FA9F9D57667.mp4
+               1 个文件     14,256,288 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2020-09 的目录
+
+2025/12/31  22:01         1,680,384 03e73841292b27cdd0d5b824be452839.mp4
+2025/12/31  21:54         1,739,104 04fffbb99d283e090dd3793898e86a82.mp4
+2025/12/31  22:02         2,670,432 0b1161477a41e3f5e30ae620e22e65ed.mp4
+2025/12/31  22:01         4,432,464 0b7ed12720518778afabe7304f5b4420.mp4
+2025/12/31  22:06         1,907,728 0e997bb2eefec8adb9cce7d8042c7aa6.mp4
+2025/12/31  21:54           932,768 19d5c0dbb6a3e82ce191ec8bee1acf81.mp4
+2025/12/31  22:02         4,003,376 1bfe8d35a16d9806d95e86a155bbb2e6.mp4
+2025/12/31  22:06           183,024 4ba81136a13234bc106ae7daa12c5c1a.mp4
+2025/12/31  22:06           644,496 4cdc6f6c2090a999ce78176a16c75273.mp4
+2025/12/31  22:01         1,754,464 7fcc0e3e5ea94a92f8e47687b6e6dcab.mp4
+2025/12/31  22:01         1,482,096 83517bb7fc7de9378949561e93bf713e.mp4
+2025/12/31  21:54         2,162,960 8c6e1366d8125471b792224e30c42a18.mp4
+2025/12/31  22:06         3,153,248 8ef3b1072174c09ffaac42668ffec9ec.mp4
+2025/12/31  22:06           196,944 c20213874ce9e1e001c2f36a5ac50087.mp4
+2025/12/31  22:02         3,645,760 ccb857460a9c077e1c3440ace7cc5034.mp4
+2025/12/31  22:06           547,360 e3ec4b645ba1abb4b065f557a6708844.mp4
+2025/12/31  22:02         2,250,768 f4c5db7d214b0bf9c65d3e74da1abda8.mp4
+2025/12/31  21:54         4,452,256 f83e861046600ce2c77cac9836aad137.mp4
+              18 个文件     37,839,632 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2020-10 的目录
+
+2025/12/31  22:02            70,000 02b16b407f6cd8770f9d6ac3eaa2ad9f.mp4
+2025/12/31  21:54         1,954,736 2059077cc5f06266cfbf325c8f464201.mp4
+2025/12/31  21:54         2,218,608 3859654cd60eca7ea9c86f4bee4bcb5f.mp4
+2025/12/31  21:54         1,924,384 3d318c2ccc40a9916600c659221e32f3.mp4
+2025/12/31  21:54         2,375,120 492c00e7e07dd5f04f98c7a34f5fbf57.mp4
+2025/12/31  21:54         1,656,000 511837c7fec8312dbf5d27ed09980432.mp4
+2025/12/31  21:54         2,047,776 5234b9210f684e625da48618e367ab1e.mp4
+2025/12/31  22:06           621,600 5353e63e5912a522bc41bf11129050ee.mp4
+2025/12/31  21:54         2,321,088 625fc71f9cda5c6182cb605bf5a7a35b.mp4
+2025/12/31  21:54         2,091,488 65b95ea8dd76456660cbc5ffccb7bbaa.mp4
+2025/12/31  22:06         1,461,216 6ec8ec63dfda4379045e126068307e4b.mp4
+2025/12/31  21:54         2,488,368 9a35e66c43f17021e9381a46d1a060c0.mp4
+2025/12/31  21:54         2,304,160 c81c1937565d66e7a1c06651e726a0d9.mp4
+2025/12/31  21:54         2,024,592 f3c547b7accf2c15ac9764ba2f8e40c7.mp4
+              14 个文件     25,559,136 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2020-11 的目录
+
+2025/12/31  21:54         2,212,240 0595c093c800fcb8c92204ddf6c5a0b8.mp4
+2025/12/31  21:54         1,658,800 44bb4db0a7fecb16961ff037d89d631a.mp4
+2025/12/31  21:54         2,641,168 5f559dc8805a2f4d3de3137fb4fbc82c.mp4
+2025/12/31  21:56           450,416 61239058188d4f4d02d419d1033c2541.mp4
+2025/12/31  21:55         4,934,240 6d79648de4b0e7e0e4eca7706649952a.mp4
+2025/12/31  22:10         1,576,752 701c3300f3d0417fb3d334490de7c253.mp4
+2025/12/31  21:54         2,128,432 86ef93192b3e91164bf73b4d26c070cf.mp4
+2025/12/31  21:54         1,658,800 8fed4c2cc60b6eb6d938277cb7495f18.mp4
+2025/12/31  21:54         2,266,528 a6b6fa8d71315bad151aa07d230b9cb2.mp4
+2025/12/31  21:54         2,192,912 b00e615188396610052944de83d9aed1.mp4
+2025/12/31  21:54         2,853,104 b739477022153a41a89b61899d5179fd.mp4
+2025/12/31  21:54         2,664,224 cdd31367a11da5781db66446a036f670.mp4
+              12 个文件     27,237,616 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2020-12 的目录
+
+2025/12/31  22:06         1,408,576 0214e019fee9639b78f294bcb800ae44.mp4
+2025/12/31  22:06           519,344 14e4119b10696e7f533debe7afd770a2.mp4
+2025/12/31  21:56           978,544 234530c4bac039b9c9b961260fba770a.mp4
+2025/12/31  21:54         1,776,416 277964451a079500f23058a3914629bc.mp4
+2025/12/31  21:54         2,061,328 4dd4edcc511fbc9670dd292ba02fcdbc.mp4
+2025/12/31  21:54         1,716,512 5c09118fb210f8e927df1a76d8d48314.mp4
+2025/12/31  21:55         3,762,736 61f81c93f30a94d804b22455d30716f2.mp4
+2025/12/31  21:54         1,919,392 6948967faf59faf0bda03552c174367c.mp4
+2025/12/31  21:54         2,087,520 80c1e9a49f88cae18ddd600aaf5261ff.mp4
+2025/12/31  22:06           524,624 8d75d20d4336e93ed677898eebc84735.mp4
+2025/12/31  21:54         1,979,856 93592cc7ddba854274f9d0a7a08cd952.mp4
+2025/12/31  21:55         2,119,904 aad8f4c8107179833c5967f9347c8777.mp4
+2025/12/31  21:55         6,653,456 ad2cde7c15385d5ac0239f608e668c93.mp4
+2025/12/31  21:56         1,210,720 b24a1b55c366c9033fde9de68ca21dd9.mp4
+2025/12/31  21:54         1,654,928 c17144b444a27d1e4633dc6d4adbd307.mp4
+              15 个文件     30,373,856 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2021-01 的目录
+
+2025/12/31  22:11         1,110,272 00eabafd1ee43881d3e5295cdd52fc26.mp4
+2025/12/31  21:57         7,067,056 037871742b29ff16c2e1332943097a39.mp4
+2025/12/31  22:11         1,013,232 09ad13c8fb627c8a9fd7af3cfdf21ae4.mp4
+2025/12/31  21:55         4,306,224 0a3bc0076da32ca7a34bc27d4499c344.mp4
+2025/12/31  21:56         3,669,616 10d6c8f66f4d101b254ca3153667d2a9.mp4
+2025/12/31  22:06           497,664 1392ca43bd6ab888716062a87306f55f.mp4
+2025/12/31  21:55         2,635,968 235a38dd57919ba3fcc915465b735fb7.mp4
+2025/12/31  22:11         1,693,856 28e00271df0c6af087d673de6cf445e9.mp4
+2025/12/31  21:55         1,054,304 3edfd1d203a4b9926b0d9a768b4651b3.mp4
+2025/12/31  21:55         2,628,960 47ffab4daf28f04f53f80e87c2edcc84.mp4
+2025/12/31  21:54         1,869,056 482c9d1f75404c13c6a9b3fccbb7b706.mp4
+2025/12/31  22:06           497,664 48ab1bb9ee4bbb82142c911ea938c0ce.mp4
+2025/12/31  21:55         3,810,880 5bc8c82e66ac436983e0a4f30977379d.mp4
+2025/12/31  22:02           316,160 6542ab45df1f2d2013e78c3d8acd9c1a.mp4
+2025/12/31  22:07         5,560,704 6e1a9d66ead83fe1d2a306c9f133a70f.mp4
+2025/12/31  22:02         5,139,312 708e0d6997e6d90599cf1c6425fa16d5.mp4
+2025/12/31  22:11         1,110,272 71d21191e275b5b6cd4bfb5c3c579b2a.mp4
+2025/12/31  22:09           854,512 75b2169df3b5c66143dfc1076ae9f0bb.mp4
+2025/12/31  21:57        12,703,344 778c3d0ff2b26cdcd71f996612f5f1da.mp4
+2025/12/31  21:56         7,423,584 79947831e582cd6695f5913da928590b.mp4
+2025/12/31  22:07         1,069,184 7d07c05d1191bff9ccb645993c8bb2a4.mp4
+2025/12/31  21:57         8,132,240 87eba7797d099c8c3df883e22516e673.mp4
+2025/12/31  22:10           497,680 8caf99647a38748efacd64a04c282013.mp4
+2025/12/31  21:55         4,517,296 8e7d8a7d379c5fde61bc4cd4641ca04a.mp4
+2025/12/31  22:08         1,449,200 8e8a40a694285d6094a431122062d02d.mp4
+2025/12/31  21:55         2,608,048 9303dbca5584211f3272c30bbfa417ae.mp4
+2025/12/31  21:55         1,438,896 98f0f662e92ba94f29bd7a132b389025.mp4
+2025/12/31  21:56           476,848 9cd71e5d36635441633552a1a2dfd774.mp4
+2025/12/31  21:55         2,446,384 a28cb2a40d524286f05874815d8e0c8b.mp4
+2025/12/31  22:08         1,089,440 a3a86a43384dd4061d9f7f37cc553faf.mp4
+2025/12/31  22:06           497,664 b215c54f70d11fe0109f3ddc5fcebf22.mp4
+2025/12/31  21:55         2,481,904 b46bc057b4a0c0555308e83b213fbf3c.mp4
+2025/12/31  22:08         6,875,040 b68553c1d115d6ed85338dc68ff99906.mp4
+2025/12/31  21:56         1,032,784 bfb6f519756ccb81d142d19db9dd5816.mp4
+2025/12/31  22:06           497,680 d66bf78e9db0b79ec327286b77dbd948.mp4
+2025/12/31  21:55         2,654,112 f05c6902c14f46d0b180518d89d24cee.mp4
+2025/12/31  21:57         5,814,400 f39a87d31d55a61e55dfec22c27c1d8f.mp4
+2025/12/31  21:55         2,461,392 fa68c05d6058c5e0ba9d6273910c089c.mp4
+              38 个文件    111,002,832 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2021-02 的目录
+
+2025/12/31  22:10         1,183,136 02a0b9950267e057588f40f007ad63a8.mp4
+2025/12/31  22:02         2,080,784 05134c3749aab0f0a2b4c792330ece40.mp4
+2025/12/31  21:55           454,016 05803d2ae2895dd79ac2bba140a90fd8.mp4
+2025/12/31  21:55         2,588,896 09b52a19ef8dd14e6fe7c52aa9fb0c92.mp4
+2025/12/31  22:06         5,326,672 105e740647a3c74d1c0e7ac136c812cb.mp4
+2025/12/31  22:10           220,112 233630cb85f81c913012623a72e7e757.mp4
+2025/12/31  21:55         2,252,112 23ac0a998915f3785acbfa38d22d7c38.mp4
+2025/12/31  22:06         3,078,000 25f7f47b1cd6782cbc68825e6c620cca.mp4
+2025/12/31  22:11           497,664 289c9de01fb4b395d7aa4fedf08ba71b.mp4
+2025/12/31  22:10         1,178,688 313d0ee314279a808cfbd0dbd106e918.mp4
+2025/12/31  22:11           497,664 34524d1c09abfe5c075f418e2fbff955.mp4
+2025/12/31  21:55         2,635,184 3b11532433bdab77ae9c29e6ad10fba1.mp4
+2025/12/31  22:11         1,533,968 3cf97e0f7b05dfb56cc44418e4cd9b4b.mp4
+2025/12/31  21:19         1,158,720 41b12a675dbdf29523d8ddb0d46cded2.mp4
+2025/12/31  21:57         1,110,272 4417dd68882ac0e5595b36bdfd61764f.mp4
+2025/12/31  21:55         2,569,632 443c2627d4798b7332749226139d4309.mp4
+2025/12/31  21:57         1,128,688 450002b687a313f252c71ffe02c881bc.mp4
+2025/12/31  21:57           570,720 462d0194f6fd6fc373e938fe767e5694.mp4
+2025/12/31  22:10         1,870,800 4d498eb27d37e2f5274dd6e532ca75bf.mp4
+2025/12/31  21:55         3,947,232 536da3dc2d2fd3403af7fdc75146b344.mp4
+2025/12/31  22:02         5,852,496 5821c0eae46d6273c552495efff47761.mp4
+2025/12/31  21:57           751,168 59f70877b598d3c340966cca817dce5b.mp4
+2025/12/31  21:55         2,268,272 5c73b1e5f7ebc1a71c52744c6cb18454.mp4
+2025/12/31  21:57           926,416 6388526b26c2bbeeb5a61b0978f06828.mp4
+2025/12/31  21:57           643,600 70f3eb59d4f9d236a2ffd979fb0334c6.mp4
+2025/12/31  22:10         1,536,608 7223d169c1fd332cdcb33e39a361a8db.mp4
+2025/12/31  21:55         2,642,848 7e6c6e518552596a4578334029c07fb1.mp4
+2025/12/31  22:07         6,092,144 874f51c34df7b63c2d84e7e350a18d94.mp4
+2025/12/31  21:57           536,688 8db887828934462e65b353d9f1571f31.mp4
+2025/12/31  22:07         5,852,496 9d918fabdb406ee24b182559269d9202.mp4
+2025/12/31  21:55         3,825,440 9fecdb0a653bcda809dcfc36706fc239.mp4
+2025/12/31  21:55           309,952 a3d1dd1309f6f902ae924a1eba935302.mp4
+2025/12/31  22:11           339,680 a524212f55b1f1b37823e6a198f6fbb8.mp4
+2025/12/31  21:57           985,216 a8ee9a93d6c13517fbb7e904b9a52498.mp4
+2025/12/31  22:10            44,496 aab0bd380d247c439fc79e7b8105513a.mp4
+2025/12/31  21:57         8,863,776 b88c26f9df68c8940d75a5322468c55a.mp4
+2025/12/31  21:55         2,556,528 bad1e6f4d818afc6c6b48cba0250af7f.mp4
+2025/12/31  21:25           995,088 c36e7957661edf01490354d3b2eab305.mp4
+2025/12/31  22:10           815,584 c84025c011d23f14fde281499ff2f287.mp4
+2025/12/31  21:25         1,078,752 c8625dcc9058a0568c88608a7cc615c2.mp4
+2025/12/31  21:55         2,788,880 cbbe0a256189319967384eba67b35669.mp4
+2025/12/31  21:57         2,717,216 cdb363e65cc6257d7fad5156bd65cab9.mp4
+2025/12/31  21:57         2,304,448 d651c0ddf7db23649e9c96e528934387.mp4
+2025/12/31  22:02         3,735,520 d6559fdb1833454d14b4e66362b25617.mp4
+2025/12/31  21:57         1,815,696 d9a7bf3e0c3848cf6e717e8f548606c5.mp4
+2025/12/31  21:55         2,651,456 da9a9de61565ef75fb4f6f8684907bd6.mp4
+2025/12/31  21:55         1,060,064 dacca366984fb028cf003b0609e82185.mp4
+2025/12/31  21:19         2,297,888 dbbfbeeca700ef00c29454e66b8a9567.mp4
+2025/12/31  21:55         2,650,736 dc63ddb6d87353f9889922047616056f.mp4
+2025/12/31  22:10           709,936 e0f9cc5201a729ecaf0602c31cafb994.mp4
+2025/12/31  22:06         5,852,496 e1550a86b6ae865d114c18571bd5387d.mp4
+2025/12/31  21:55         3,585,072 ec39d260cef73005312f55d2c9e4e99b.mp4
+2025/12/31  21:57         8,723,520 f8aa99341503b80ac65a976c7895ad70.mp4
+2025/12/31  21:25         1,215,312 f99ba6b6828bdbd3845d0ea09eb2440d.mp4
+2025/12/31  21:19         3,042,384 f9c9173dcfa612454fa4eab7c2a2828e.mp4
+2025/12/31  22:06           546,720 fb590cd34b5c3b0448eda794c058c165.mp4
+              56 个文件    128,497,552 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2021-03 的目录
+
+2025/12/31  21:57           464,656 91e0cf57b76ce9516db5079106d4cf9f.mp4
+2025/12/31  21:55         2,467,504 b05976f257eb8720419c68de9ec92e49.mp4
+2025/12/31  21:55         1,885,104 d3d525a4238fa0374dd41799bf2bdd7d.mp4
+2025/12/31  21:55         2,562,976 d5b29b9608170e8cd18d73dc23fce0bd.mp4
+2025/12/31  21:55         2,619,440 e803595d953a847eb4957efc30d27d13.mp4
+               5 个文件      9,999,680 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2024-02 的目录
+
+2025/12/31  21:19         1,622,384 06b54d8979321a7013cd2934595bded6.mp4
+2025/12/31  21:19         1,957,472 08a7f235c524337b6bf02990fce7f924.mp4
+2025/12/31  22:07         1,036,544 299df0a05921dd213992d540dc28f4ea.mp4
+2025/12/31  21:55         6,810,352 4fd2acf064795cff00d7e8c3660b70dc.mp4
+2025/12/31  21:55         1,641,312 6ab0cfcb3877447cfe51598aacc8a984.mp4
+               5 个文件     13,068,064 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2024-05 的目录
+
+2025/12/31  21:18           174,080 6649b131bc8f165913e0d1b668adeb45.mp4
+               1 个文件        174,080 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2024-12 的目录
+
+2025/12/31  22:11         1,409,344 5526a89f20156e2e0f5dc03651774fcc.mp4
+               1 个文件      1,409,344 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-01 的目录
+
+2025/12/31  22:03           758,656 074ffcb4810f952c8a5e2ef6397f86a8.mp4
+               1 个文件        758,656 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-03 的目录
+
+2025/12/31  21:19         1,403,184 08fee5aaed8da551f937e6deece5b531.mp4
+2025/12/31  22:02         6,800,490 b30de4487fa361653f1f9a5393b53199.mp4
+2025/12/31  21:57         1,403,184 c1b210d0cd12233c951da4049db6e581.mp4
+2025/12/31  21:57         4,648,448 e6b456a7bd35c83b6a0b8307e077784b.mp4
+2025/12/31  21:19         4,648,448 ea174763914cf03db905fc3c28b0d560.mp4
+               5 个文件     18,903,754 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-04 的目录
+
+2025/12/31  21:18         1,138,351 08e0edc2405634b94ac46e50f215056e.mp4
+2025/12/31  21:25           379,461 4495c8d1664b6d7cfba3f8588cb66487.mp4
+2025/12/31  21:25         6,587,691 5889807fbcb3bea79d82a0e0f5c2d38e.mp4
+2025/12/31  22:09         1,283,607 7ebeecf179b9a311bf349a543ff992cf.mp4
+2025/12/31  21:25         6,212,898 f2d584286e0ffa792cfdc3b9eb6d3ba3.mp4
+               5 个文件     15,602,008 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-05 的目录
+
+2025/12/31  22:03         1,271,705 628494e42d5b412a3fbfdc10d2096690.mp4
+               1 个文件      1,271,705 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-06 的目录
+
+2025/12/31  22:02         2,490,752 4d65b285102e5c5f013e9dc0c6fddd62.mp4
+2025/12/31  22:01           792,213 7611dd9e027756c488126a5147b275ff.mp4
+2025/12/31  22:07        13,695,606 88f902e9f8b2ccdbf7ed99c70237efc1.mp4
+2025/12/31  22:02           257,236 bc29496c182ad36ac781f5a2a6e6941e.mp4
+               4 个文件     17,235,807 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-07 的目录
+
+2025/12/31  22:07         1,418,537 06cded0cc88d32deb4929c3c3e890cd6.mp4
+2025/12/31  22:00           369,609 093f3231ea67de7c387b96f0f4503dbb.mp4
+2025/12/31  21:19           447,858 19913231da4d151cb5ea81a3c1c96fb7.mp4
+2025/12/31  22:08           412,262 66918ac6c51698893d285da9d94af88a.mp4
+2025/12/31  22:07         4,294,436 8ea6750525edf2e17be6f88a7df58e57.mp4
+2025/12/31  22:02           640,978 91ca808dbdc79b2eca4435f1df44d8d0.mp4
+2025/12/31  22:08           620,749 980c0ce7f40b89aed1731079a792527e.mp4
+2025/12/31  22:05           331,014 aef70853817931ecce2f4cb2a81f3781.mp4
+               8 个文件      8,535,443 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-08 的目录
+
+2025/12/31  22:08         3,637,035 1e7592f54c2520c05d2ef149ebb50715.mp4
+2025/12/31  22:02         1,465,605 3a55cbf62f8a1f7c3d229757f9a75065.mp4
+2025/12/31  21:19           230,166 6322f52fc5ad4b8afa235cefa7b33048.mp4
+2025/12/31  22:00         1,465,605 9b8928d66c4f5b1ef77ddc0d0d38ee89.mp4
+2025/12/31  21:56         1,242,928 bd28aa917e861231e43be6a79ae2830a.mp4
+2025/12/31  21:19         4,622,945 c62cdb63f2b9e05f9aab4c28ac8df65b.mp4
+2025/12/31  21:19         1,516,736 d40f9077967974877b78ca886f3bcef3.mp4
+2025/12/31  21:19           550,467 d836d67358d91c3c8fe4bfc958db3430.mp4
+2025/12/31  21:19         3,637,035 ece15e5eb0c353002fbf2e7e0888050e.mp4
+2025/12/31  21:19        23,786,634 f82cdeae3db9786197dbfd6c7fdba13d.mp4
+              10 个文件     42,155,156 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-09 的目录
+
+2025/12/31  22:01         1,252,181 02aabbe3a6d769b23b8a0f6ae5cc9720.mp4
+2025/12/31  22:02           564,658 0ff983898c537c8293dbc96861e3f90f.mp4
+2025/12/31  22:01           409,444 11ac55269eb9fd657e969cc0cccc8add.mp4
+2025/12/31  22:03         1,462,993 15df4db22b8c9c37408f3a9168e49cd9.mp4
+2025/12/31  22:03         1,329,138 1dc04f19741dd52b3aef333372f3cef9.mp4
+2025/12/31  22:03           409,444 264590eae60ec522e622e37a27e4654f.mp4
+2025/12/31  22:03           409,444 2e953e9caa2914c711e707277ea24957.mp4
+2025/12/31  22:03         1,462,993 43b780978e51b810510a5a19fa8fc355.mp4
+2025/12/31  22:03           188,120 5e4fb0fabe8e3683a623e7f19bfe0d87.mp4
+2025/12/31  21:57           409,444 a399f074218cee700c8a6cdda7924b32.mp4
+2025/12/31  22:03           403,630 c5c9673cc4abb98a9a9f8af8d91abcb4.mp4
+2025/12/31  22:03         1,252,181 d57a3a85aa0c8b0057f552448d575496.mp4
+2025/12/31  21:57         1,252,181 d5f0ba138f1d71bf029d8716c0befde0.mp4
+2025/12/31  22:03           687,092 d9bc2ec4932844964202c74b46508b01.mp4
+2025/12/31  21:57           422,954 e30daa6a2bdf398577a68db2a231ee9b.mp4
+2025/12/31  22:03         1,252,181 fab52b6853e7d434aa2cb29c0239ef17.mp4
+              16 个文件     13,168,078 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-10 的目录
+
+2025/12/31  22:07           362,602 0f721748b2a61e17826a47be1991cb8b.mp4
+2025/12/31  22:05         1,592,935 2456f346f5deea0d02bbcb07f30b22ed.mp4
+2025/12/31  22:03         6,606,724 2f2dde5446d1285c2c738ea5e940cd88.mp4
+2025/12/31  22:11            69,369 46c3dab3666e814ad8dbaed1011ab305.mp4
+2025/12/31  22:03           577,773 4f2b007229b9ae4c6e350d71c5556aa1.mp4
+2025/12/31  22:01         3,378,843 e9a718f8976c77dec0a3f3976ef64190.mp4
+               6 个文件     12,588,246 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-11 的目录
+
+2025/12/31  22:09        11,298,423 0e9d99b9ae882bb94ee6dcdbff0b9110.mp4
+2025/12/31  22:04           533,552 56f39fb7bb30138ce733b89eb6ccc795.mp4
+2025/12/31  22:09           411,085 82c69c0109e48e96f41d5916ee537c9b.mp4
+2025/12/31  22:03         1,707,981 d302cd3ae564df365ef1725c977ab20d.mp4
+2025/12/31  22:04           348,011 d42213e2fc2f3091a0ee0954c38fd0c2.mp4
+               5 个文件     14,299,052 字节
+
+ C:\Users\Zhen\Documents\xwechat_files\wxid_sqf49rlbgu5n22_8848\msg\video\2025-12 的目录
+
+2025/12/31  21:57           537,185 032a8cc161d24dbf1af9b23f9dd50369.mp4
+2025/12/31  22:08           614,331 6ce5b5cd845a28766db44b4725e467ac.mp4
+2025/12/31  22:09           614,331 8b19b5063e39150a200b47288ba9ea8a.mp4
+2025/12/31  22:00           467,127 93c41c0c7a112c0aff0d0943669d600b.mp4
+2025/12/31  22:03           735,640 e3cb442bdc8eadd9b156af50ecdd308e.mp4
+2025/12/31  22:09         2,277,315 e75246a032849b7dda33278361840430.mp4
+               6 个文件      5,245,929 字节
+
+ C:\Users\Zhen\OneDrive\图片\本机照片\2023\02 的目录
+
+2023/02/21  18:12       (6,734,573) 20230221_101217000_iOS.mp4
+               1 个文件      6,734,573 字节
+
+     所列文件总数:
+             296 个文件    890,442,012 字节
+               0 个目录 71,946,199,040 可用字节

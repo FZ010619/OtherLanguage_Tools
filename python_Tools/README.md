@@ -2,7 +2,7 @@
 
 这个目录收纳 Python 编写的小工具。
 
-## 计划收纳
+## 当前内容
 
-- Python_Tools 仓库内容
-- Life_tOOls 仓库内容
+- [Python_Tools](Python_Tools)
+- [Life_tOOls](Life_tOOls)

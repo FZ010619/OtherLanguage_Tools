@@ -1,0 +1,665 @@
+ 驱动器 D 中的卷是 Ging_Learn
+ 卷的序列号是 12B3-8EFE
+
+ D:\DeepLearningLesson\HomeWork2 的目录
+
+2026/03/30  23:54       116,818,784 演示视频.mp4
+               1 个文件    116,818,784 字节
+
+ D:\EV录屏 的目录
+
+2025/11/09  09:57       494,406,516 20251109_交之前的组会.mp4
+               1 个文件    494,406,516 字节
+
+ D:\IDM_Download\Video\各类演讲 的目录
+
+2023/06/19  23:24       448,723,822 Why go to the moon-- - John F. Kennedy at Rice University_5.mp4
+               1 个文件    448,723,822 字节
+
+ D:\IDM_Download\Video\歌曲 的目录
+
+2024/11/02  20:02        42,779,127 Jay Chou 说好的幸福呢 Vocal Cover - 周董生日快乐！【说好的幸福呢】翻唱 - 来感受层层推进的情绪吧.mp4
+2024/11/30  23:06     3,683,118,223 [学友.经典世界巡回演唱会].台北站 - 1.[学友.经典世界巡回演唱会].台北站(Av954223242,P1).mp4
+2024/11/05  10:51     1,478,870,307 【蓝光原盘iso】【香港】官方60fps _ 全程中字 _ 陈奕迅 - DUO 2010演唱会 Ea - 1.【蓝光原盘iso】【香港】官方60fps _ 全程中字 _ 陈奕迅 - DU(Av113270048425894,P1).mp4
+2024/11/04  11:29        24,731,669 波西米亚狂想抽 - 1.波西米亚狂想抽(Av112888719085539,P1).mp4
+2024/11/04  11:29        34,329,143 走遍格聂山也找不到同样的《理塘烟馆》「?PIUM DEN LITANG」 - 1.走遍格聂山也找不到同样的《理塘烟馆》「?PIUM DEN LITANG」(Av113118936041845,P1).mp4
+               5 个文件  5,263,828,469 字节
+
+ D:\NVIDIA_\Captures 的目录
+
+2025/05/04  18:47       113,591,825 Just Cause 3 2025-05-04 18-46-45.mp4
+               1 个文件    113,591,825 字节
+
+ D:\NVIDIA_\Forza Horizon 4 的目录
+
+2022/12/03  02:48         1,947,180 Forza Horizon 4 2022.12.03 - 02.48.08.01.mp4
+               1 个文件      1,947,180 字节
+
+ D:\NVIDIA_\Grand Theft Auto V 的目录
+
+2022/08/10  12:10       451,492,955 Grand Theft Auto V 2022.08.10 - 12.07.58.01.mp4
+2022/08/10  12:15     1,486,659,086 Grand Theft Auto V 2022.08.10 - 12.10.35.02.mp4
+               2 个文件  1,938,152,041 字节
+
+ D:\NVIDIA_\Just Cause 3 的目录
+
+2025/06/14  12:58       615,652,576 Just Cause 3 2025.06.14 - 12.56.35.01.mp4
+               1 个文件    615,652,576 字节
+
+ D:\Steam\steamapps\common\Delta Force\Launcher\tpf_ui\res\videos\dlc 的目录
+
+2025/08/27  23:24         9,450,006 dlc_video.mp4
+2025/08/27  23:24         9,450,006 dlc_video_temp.mp4
+               2 个文件     18,900,012 字节
+
+ D:\Steam\steamapps\common\Delta Force\Launcher\tpf_ui\res\videos\login 的目录
+
+2025/08/27  23:24         6,407,183 login_video.mp4
+2025/08/27  23:24         6,407,183 login_video_temp.mp4
+               2 个文件     12,814,366 字节
+
+ D:\Steam\steamapps\common\Delta Force\Launcher\tpf_ui\res\videos\main_ui 的目录
+
+2025/08/27  23:24         6,998,161 main_video.mp4
+2025/08/27  23:24         6,998,161 main_video_temp.mp4
+               2 个文件     13,996,322 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1090286291 的目录
+
+2024/01/19  09:32       245,820,186 BLV001.mp4
+               1 个文件    245,820,186 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1220245565 的目录
+
+2024/01/19  09:32        40,726,589 [MP4 720p] TONIGHT IS THE NIGHT (Extended).mp4
+               1 个文件     40,726,589 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1393526294 的目录
+
+2024/08/04  12:03        34,916,137 闪电 公路车山地车 宣传片：我们爱骑行！ - 1.1(Av16240391,P1).Flv.mp4
+               1 个文件     34,916,137 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1403625644 的目录
+
+2024/01/19  09:32         3,841,733 Dune (1).mp4
+               1 个文件      3,841,733 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1416086179 的目录
+
+2024/01/19  09:32           486,930 天上不会掉馅饼.mp4
+               1 个文件        486,930 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1431173605 的目录
+
+2024/09/27  20:38        15,765,346 15254257290dc6c917e9e4cea6.mp4_last.mp4
+               1 个文件     15,765,346 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1498197700 的目录
+
+2024/08/16  12:49        69,589,954 Final Work Lunar Tears ffff.mp4
+               1 个文件     69,589,954 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1507903545 的目录
+
+2024/01/19  09:32         5,442,038 素材箱.mp4
+               1 个文件      5,442,038 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1519060954 的目录
+
+2024/01/19  09:32        26,391,571 【石原里美】全程高能 请勿眨眼！ [AV 15138956, From JIJIDOWN.COM].mp4
+               1 个文件     26,391,571 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1531897390 的目录
+
+2024/01/19  09:32       174,403,861 壁纸2_new.mp4
+               1 个文件    174,403,861 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1537482815 的目录
+
+2024/01/22  22:18         6,500,186 Артиллерия 2.mp4
+               1 个文件      6,500,186 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1576041584 的目录
+
+2024/01/19  09:32       151,353,679 花村2.mp4
+               1 个文件    151,353,679 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1661372823 的目录
+
+2026/01/05  17:39       122,767,256 EP03.mp4
+               1 个文件    122,767,256 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1720130572 的目录
+
+2024/08/03  21:17        11,386,604 0.mp4
+               1 个文件     11,386,604 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1741779285 的目录
+
+2024/01/19  09:32        85,232,790 yuanshi-1.mp4
+               1 个文件     85,232,790 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1755870977 的目录
+
+2024/01/19  09:32        38,822,288 初音（2）.mp4
+               1 个文件     38,822,288 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1759643041 的目录
+
+2024/01/19  09:32        75,902,137 合成 1.mp4
+               1 个文件     75,902,137 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1781466079 的目录
+
+2024/01/19  09:32       114,389,099 合成 1_1.mp4
+               1 个文件    114,389,099 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1800805973 的目录
+
+2024/08/04  12:01       136,943,666 Desktop 2019.07.12 - 08.46.50.01.mp4
+               1 个文件    136,943,666 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1811167820 的目录
+
+2024/05/13  23:25        44,389,929 SummerRain_Sound.mp4
+               1 个文件     44,389,929 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1851313761 的目录
+
+2024/01/19  09:32        46,605,988 10809011623.mp4
+               1 个文件     46,605,988 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1865466805 的目录
+
+2024/01/19  09:32         1,138,752 視力回復トレーニング　緑の丸を目で追ってください.mp4
+               1 个文件      1,138,752 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1905367702 的目录
+
+2024/01/19  09:32       120,507,859 69788510_1_0.mp4
+               1 个文件    120,507,859 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1930409844 的目录
+
+2024/01/19  09:32       377,566,788 InShot_20191207_111258596.mp4
+               1 个文件    377,566,788 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1960350180 的目录
+
+2024/01/22  22:18         5,992,648 风景.mp4
+               1 个文件      5,992,648 字节
+
+ D:\Steam\steamapps\workshop\content\431960\1984535393 的目录
+
+2026/01/05  17:39       395,023,736 home_by_VISUALDON_loop.mp4
+               1 个文件    395,023,736 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2002326996 的目录
+
+2024/01/19  09:32        16,788,784 156044583635aa3988827147c2.mp4_last.mp4
+               1 个文件     16,788,784 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2003005131 的目录
+
+2026/03/06  18:09       174,175,140 SSOA.mp4
+               1 个文件    174,175,140 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2035555250 的目录
+
+2024/01/19  09:32        57,119,915 深海.mp4
+               1 个文件     57,119,915 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2113707136 的目录
+
+2024/01/19  09:32        24,862,907 mylivewallpapers.com-Samurai-Jinx-LoL.mp4
+               1 个文件     24,862,907 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2118331982 的目录
+
+2024/01/19  09:32       252,788,658 EP17_steam.mp4
+               1 个文件    252,788,658 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2130919433 的目录
+
+2024/04/13  18:52        24,184,007 wallpaperwaifu.com-Lone-Samurai-Sekiro-Desktop.mp4
+               1 个文件     24,184,007 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2138368721 的目录
+
+2024/01/19  09:32        22,161,810 Rick_Astley_Never_Gonna_Give_You_Up.mp4
+               1 个文件     22,161,810 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2191945058 的目录
+
+2024/05/08  11:32        32,396,066 莲华.mp4
+               1 个文件     32,396,066 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2290199265 的目录
+
+2024/01/19  09:32        31,567,708 唤起工农千百万！.mp4
+               1 个文件     31,567,708 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2304573941 的目录
+
+2024/01/19  09:32         1,245,762 cat - 10Convert.com.mp4.mp4
+               1 个文件      1,245,762 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2351349782 的目录
+
+2025/12/26  13:37        74,864,914 faze2.mp4
+               1 个文件     74,864,914 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2358176341 的目录
+
+2024/01/19  09:32        99,337,132 囍fin.mp4
+               1 个文件     99,337,132 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2390303351 的目录
+
+2024/01/19  09:32        97,319,155 鲸落最终版 动态水印.mp4
+               1 个文件     97,319,155 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2447928310 的目录
+
+2026/01/05  17:39       228,459,255 Floating_In_Space_By_VISUALDON.mp4
+               1 个文件    228,459,255 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2455753112 的目录
+
+2024/01/19  09:32        39,566,394 SciFiOceanTreev6.mp4
+               1 个文件     39,566,394 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2484821756 的目录
+
+2024/10/06  09:12       123,699,347 60帧超人真人版本白狼.mp4
+               1 个文件    123,699,347 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2499006048 的目录
+
+2024/08/16  18:25        40,100,645 五星红旗.mp4
+               1 个文件     40,100,645 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2562148920 的目录
+
+2024/11/02  22:14       118,994,673 黄昏海.mp4
+               1 个文件    118,994,673 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2578083555 的目录
+
+2025/03/30  20:10        84,112,524 sexpaper_1.mp4
+               1 个文件     84,112,524 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2580111027 的目录
+
+2024/08/16  18:28         9,820,549 毛主席.mp4
+               1 个文件      9,820,549 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2615027523 的目录
+
+2024/01/19  09:32        77,745,106 五星红旗4K.mp4
+               1 个文件     77,745,106 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2624215601 的目录
+
+2024/01/19  09:32       104,778,315 About MC.mp4
+               1 个文件    104,778,315 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2626380607 的目录
+
+2025/02/20  16:04        99,562,967 IMG_0505.mp4
+               1 个文件     99,562,967 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2645415436 的目录
+
+2025/12/03  09:51           215,882 sp_credits_bg.mp4
+               1 个文件        215,882 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2688729008 的目录
+
+2026/03/06  18:10     2,095,078,563 小合集3.mp4
+               1 个文件  2,095,078,563 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2714940166 的目录
+
+2024/01/19  09:32        26,960,254 “更努力，更好，更快，更强！”_高清 1080P.mp4
+               1 个文件     26,960,254 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2759358297 的目录
+
+2026/03/06  18:09       927,933,651 Maxim_Model-Choi_Sehee-Uk-Jumulok-Video.mp4
+               1 个文件    927,933,651 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2768269536 的目录
+
+2025/08/30  09:42       118,109,661 faze clan.MP4
+               1 个文件    118,109,661 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2774495922 的目录
+
+2024/01/19  09:32     1,047,175,114 2K.mp4
+               1 个文件  1,047,175,114 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2775891975 的目录
+
+2024/01/19  09:32       113,651,299 小豚豚豚鼠-3（9）（87s）.mp4
+               1 个文件    113,651,299 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2777876802 的目录
+
+2024/01/19  09:32     3,439,467,815 Infinite Journeys.mp4
+               1 个文件  3,439,467,815 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2781759415 的目录
+
+2024/07/13  23:00        27,869,052 【石原里美舔屏向】来自十元小妖精的微笑_Trim.mp4
+               1 个文件     27,869,052 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2787358132 的目录
+
+2024/01/19  09:32       124,936,297 J20动态壁纸4K25.mp4
+               1 个文件    124,936,297 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2787494900 的目录
+
+2024/09/27  20:35       134,686,660 Ronnie Coleman MP4.mp4
+               1 个文件    134,686,660 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2818686922 的目录
+
+2026/05/18  10:30       881,828,009 我的项目 (11).MP4
+               1 个文件    881,828,009 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2825047014 的目录
+
+2024/01/19  09:32         1,310,901 ea4db9ce08d68a289a6cd8a9b15737e7.mp4
+               1 个文件      1,310,901 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2846610811 的目录
+
+2024/09/27  20:34        12,645,115 videoplayback (3).mp4
+               1 个文件     12,645,115 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2854593475 的目录
+
+2024/01/19  09:32         4,838,827 9d945f0072dc86ffa68c61e8230cf4ba.mp4
+               1 个文件      4,838,827 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2855741931 的目录
+
+2026/04/13  17:22         2,813,748 a40619c8baaafe6596f49544a678180d_preview.mp4
+               1 个文件      2,813,748 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2880326225 的目录
+
+2026/05/18  10:29       170,410,165 2.mp4
+               1 个文件    170,410,165 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2892098526 的目录
+
+2024/09/20  22:35        22,087,411 TU-160 Blur Phonk T190L11.mp4
+               1 个文件     22,087,411 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2903634960 的目录
+
+2026/05/18  10:32       104,663,901 22730-sc-720p1.mp4
+               1 个文件    104,663,901 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2903656759 的目录
+
+2026/05/18  10:32       111,536,963 22729-sc-720p2.mp4
+               1 个文件    111,536,963 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2903661831 的目录
+
+2026/05/18  10:32       100,460,434 22728-sc-720p3.mp4
+               1 个文件    100,460,434 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2903671728 的目录
+
+2026/05/18  10:32       417,455,306 12552588-1080p1.mp4
+               1 个文件    417,455,306 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2903676667 的目录
+
+2026/05/18  10:30       381,261,139 12450141-1080p2.mp4
+               1 个文件    381,261,139 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2915842694 的目录
+
+2024/01/19  09:32        36,170,186 2043696631 (1)_output.mp4
+               1 个文件     36,170,186 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2937685723 的目录
+
+2024/01/19  09:32       343,137,575 darkstar on aircraft carrier by visualdon.mp4
+               1 个文件    343,137,575 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2957031237 的目录
+
+2025/08/30  09:37       152,854,637 202304032054.mp4
+               1 个文件    152,854,637 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2961451046 的目录
+
+2024/01/19  09:32       732,620,601 NOBODA.mp4
+               1 个文件    732,620,601 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2965146148 的目录
+
+2026/01/05  20:15     7,151,292,590 催眠性指導.mp4
+               1 个文件  7,151,292,590 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2965173432 的目录
+
+2026/01/05  21:03     4,757,543,927 復讐催眠.mp4
+               1 个文件  4,757,543,927 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2970301388 的目录
+
+2025/02/22  09:29       102,226,640 +HAKKODA Twilight ? 八甲田薄暮の芒 [4K]-00.00.09.971-00.01.40.094.mp4
+               1 个文件    102,226,640 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2987534984 的目录
+
+2026/01/05  20:17       715,995,944 Milk 补帧 稳定镜头.mp4
+               1 个文件    715,995,944 字节
+
+ D:\Steam\steamapps\workshop\content\431960\2992929191 的目录
+
+2024/04/03  22:42     1,112,681,085 【7d68.xyz】极乐净土（无水印2K）.mp4
+               1 个文件  1,112,681,085 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3004013430 的目录
+
+2024/01/19  09:32        16,795,910 少女与晚霞.mp4
+               1 个文件     16,795,910 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3036947630 的目录
+
+2024/08/16  18:20        26,576,233 党旗3.mp4
+               1 个文件     26,576,233 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3068534168 的目录
+
+2026/01/05  19:42       638,134,166 【FD堕落玩偶】-蜥蜴人.mp4
+               1 个文件    638,134,166 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3137685567 的目录
+
+2026/01/05  20:13     3,178,164,781 艳母.MP4
+               1 个文件  3,178,164,781 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3160669401 的目录
+
+2026/03/06  18:01         1,592,983 aska.mp4
+               1 个文件      1,592,983 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3181442537 的目录
+
+2024/09/20  22:34       283,938,889 4K超清视觉享受俄罗斯白天鹅图-160超音速可变后掠翼远程战略轰炸机飞行画面.mp4
+               1 个文件    283,938,889 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3208790547 的目录
+
+2024/10/17  14:14       285,564,421 Video_240401145844_Segment(1).mp4
+               1 个文件    285,564,421 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3276955573 的目录
+
+2025/12/26  10:51       110,503,472 ad5fa9597db193112408fe0e058c3ce8b07bd7e2_ghq5.mp4
+               1 个文件    110,503,472 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3310061130 的目录
+
+2024/11/11  17:11        11,932,875 @-杨奇- 的个人主页 - 微博.mp4
+               1 个文件     11,932,875 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3314492008 的目录
+
+2026/01/24  20:05       336,235,138 世界很温柔—《龙族》上杉绘梨衣.mp4
+               1 个文件    336,235,138 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3350360121 的目录
+
+2025/02/10  12:46         1,185,178 WeChat_20241018032534.mp4
+               1 个文件      1,185,178 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3451858260 的目录
+
+2025/12/26  10:48       345,938,227 lily pad ride.mp4
+               1 个文件    345,938,227 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3507542349 的目录
+
+2026/01/05  18:10       396,678,236 5月订阅『陪玩少女』Gee.mp4
+               1 个文件    396,678,236 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3546821092 的目录
+
+2026/04/13  17:00        10,872,988 KKKK1.mp4
+               1 个文件     10,872,988 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3577529481 的目录
+
+2026/01/05  19:55     1,385,949,794 阿格莱雅5.mp4
+               1 个文件  1,385,949,794 字节
+
+ D:\Steam\steamapps\workshop\content\431960\3683255353 的目录
+
+2026/03/23  23:27        25,302,036 horizon-sky-wanderer-moewalls-com.mp4
+               1 个文件     25,302,036 字节
+
+ D:\Steam\steamapps\workshop\content\431960\800753510 的目录
+
+2024/01/19  09:32        38,666,948 D.Va Wallpaper.mp4
+               1 个文件     38,666,948 字节
+
+ D:\Steam\steamapps\workshop\content\431960\816353979 的目录
+
+2024/01/19  09:32        20,759,590 Redial.mp4
+               1 个文件     20,759,590 字节
+
+ D:\Steam\steamapps\workshop\content\431960\821372791 的目录
+
+2024/08/20  14:44       318,993,335 灵梦.mp4
+               1 个文件    318,993,335 字节
+
+ D:\Steam\steamapps\workshop\content\431960\824548397 的目录
+
+2024/05/18  22:10        58,117,985 Clannad 2007 Creditless Ending [BluRay 1920x1080p 23.976fps x264-Hi10P FLACx3 ASSx2 PGSx2] - mawen1250.mp4
+               1 个文件     58,117,985 字节
+
+ D:\Steam\steamapps\workshop\content\431960\826320878 的目录
+
+2024/01/19  09:32        65,511,662 video_x264~1.mp4
+               1 个文件     65,511,662 字节
+
+ D:\Steam\steamapps\workshop\content\431960\827435642 的目录
+
+2024/01/19  09:32       133,264,140 acs1080P.mp4
+               1 个文件    133,264,140 字节
+
+ D:\Steam\steamapps\workshop\content\431960\828230257 的目录
+
+2024/01/19  09:32       182,668,227 序列 01_1.mp4
+               1 个文件    182,668,227 字节
+
+ D:\Steam\steamapps\workshop\content\431960\828703535 的目录
+
+2024/01/19  09:32        39,799,590 switzerland_alps_mountains_night_beautiful_landscape_99817_1920x1080.mp4
+               1 个文件     39,799,590 字节
+
+ D:\Steam\steamapps\workshop\content\431960\832047273 的目录
+
+2024/01/19  09:32         3,876,464 EOS M 牧场篇cut 暗中观察循环版.mp4
+               1 个文件      3,876,464 字节
+
+ D:\Steam\steamapps\workshop\content\431960\837761056 的目录
+
+2024/08/20  14:46        78,358,947 Ori DE Silent.mp4
+               1 个文件     78,358,947 字节
+
+ D:\Steam\steamapps\workshop\content\431960\851734058 的目录
+
+2024/01/19  09:32        67,558,925 罪恶王冠.mp4
+               1 个文件     67,558,925 字节
+
+ D:\Steam\steamapps\workshop\content\431960\860024140 的目录
+
+2024/01/19  09:32        36,280,126 Islamic remix dance.mp4
+               1 个文件     36,280,126 字节
+
+ D:\Steam\steamapps\workshop\content\431960\860641835 的目录
+
+2024/01/19  09:32       443,729,617 清流の国3.mp4
+               1 个文件    443,729,617 字节
+
+ D:\Steam\steamapps\workshop\content\431960\869514539 的目录
+
+2024/01/19  09:32        11,651,144 D.VA.mp4
+               1 个文件     11,651,144 字节
+
+ D:\Steam\steamapps\workshop\content\431960\882912009 的目录
+
+2025/02/22  09:27        27,885,737 U-Bahn Station Vienna.mp4
+               1 个文件     27,885,737 字节
+
+ D:\Steam\steamapps\workshop\content\431960\926413114 的目录
+
+2024/01/19  09:32       327,300,124 Ana LWP.mp4
+               1 个文件    327,300,124 字节
+
+ D:\Steam\steamapps\workshop\content\431960\932546562 的目录
+
+2024/01/19  09:32       136,598,373 Overwatch 05.25.2017 - 22.04.03.01.mp4
+               1 个文件    136,598,373 字节
+
+ D:\Steam\steamapps\workshop\content\431960\933643160 的目录
+
+2024/01/19  09:32        27,718,842 Overwatch 2017-05-27 11-28-50-498.mp4
+               1 个文件     27,718,842 字节
+
+ D:\Steam\steamapps\workshop\content\431960\934178809 的目录
+
+2024/01/19  09:32       115,548,509 ow.mp4
+               1 个文件    115,548,509 字节
+
+ D:\Steam\steamapps\workshop\content\431960\973483795 的目录
+
+2025/03/30  20:40       124,604,529 Мое видео.mp4
+               1 个文件    124,604,529 字节
+
+ D:\YanYiGuanCe\戴老师要的论文\嘉怡师姐 的目录
+
+2025/11/07  15:54       185,781,918 20251107_琰君师兄.mp4
+2025/09/24  17:48       542,512,118 沉陷论文_20250924_165653.mp4
+               2 个文件    728,294,036 字节
+
+ D:\研究生学习内容\各类知识学习\BaiduSyncdisk 的目录
+
+2021/11/03  12:38         6,957,613 一分钟精通如何使用同步空间.mp4
+               1 个文件      6,957,613 字节
+
+     所列文件总数:
+             139 个文件 48,647,820,538 字节
+               0 个目录 214,897,012,736 可用字节

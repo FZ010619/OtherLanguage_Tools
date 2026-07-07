@@ -2,7 +2,7 @@
 
 这个目录收纳实验项目、教学项目和已归档内容。
 
-## 计划收纳
+## 当前内容
 
-- exp_6 仓库内容
-- desktop-tutorial 仓库内容
+- [exp_6](exp_6)
+- [desktop-tutorial](desktop-tutorial)

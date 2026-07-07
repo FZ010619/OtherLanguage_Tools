@@ -1,0 +1,2763 @@
+################################################################################
+# 项目代码库完整导出
+# 时间: 2026-03-29 20:47:52
+# 路径: D:/Python_Tools/FuzhouWebGIS
+################################################################################
+
+## 项目目录结构
+
+FuzhouWebGIS/
+├── main.py
+├── requirements.txt
+└── static/
+    └── index.html
+
+================================================================================
+
+## 文件内容
+
+==================== FILE: main.py ====================
+
+import json
+import os
+from typing import Dict, List, Optional
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
+from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
+import psycopg2
+from psycopg2.extras import RealDictCursor
+
+app = FastAPI()
+
+DB_CONFIG = {
+    "host": os.getenv("PGHOST", "localhost"),
+    "database": os.getenv("PGDATABASE", "GISdata"),
+    "user": os.getenv("PGUSER", "postgres"),
+    "password": os.getenv("PGPASSWORD", os.getenv("DB_PASSWORD", "admin123")),
+    "port": int(os.getenv("PGPORT", "5432")),
+}
+
+AMAP_KEY = os.getenv("AMAP_KEY", "")
+LAST_MILE_THRESHOLD_M = 1000.0
+
+
+def get_db_connection():
+    try:
+        return psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"数据库连接失败: {exc}")
+
+
+def get_shortest_path(start_coords, end_coords, mode: str = "car") -> dict:
+    """
+    使用 PostGIS + pgRouting 计算最短路径。
+
+    参数:
+    - start_coords: (lng, lat)，WGS84 (EPSG:4326)
+    - end_coords: (lng, lat)，WGS84 (EPSG:4326)
+    - mode: "car" 或 "walk"
+    """
+    if mode not in ("car", "walk"):
+        return {"success": False, "message": "mode 仅支持 'car' 或 'walk'"}
+
+    if not isinstance(start_coords, (list, tuple)) or not isinstance(end_coords, (list, tuple)):
+        return {"success": False, "message": "start_coords 和 end_coords 必须是 (lng, lat)"}
+
+    if len(start_coords) != 2 or len(end_coords) != 2:
+        return {"success": False, "message": "坐标格式错误，应为 (lng, lat)"}
+
+    try:
+        start_lng, start_lat = float(start_coords[0]), float(start_coords[1])
+        end_lng, end_lat = float(end_coords[0]), float(end_coords[1])
+    except (TypeError, ValueError):
+        return {"success": False, "message": "坐标必须是数字"}
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        nearest_any_sql = """
+        SELECT
+            id,
+            ST_Distance(
+                geom,
+                ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+            ) AS dist_m
+        FROM fuzhou_roads_vertices
+        ORDER BY geom <-> ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+        LIMIT 1;
+        """
+
+        nearest_edge_cost_sql = """
+        SELECT cost_car_s
+        FROM fuzhou_roads_clean
+        ORDER BY geom <-> ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+        LIMIT 1;
+        """
+
+        nearest_drivable_sql = """
+        WITH drivable_vertices AS (
+            SELECT DISTINCT v.id, v.geom
+            FROM fuzhou_roads_vertices v
+            JOIN fuzhou_roads_clean r ON v.id = r.source OR v.id = r.target
+            WHERE r.cost_car_s > 0
+        )
+        SELECT
+            id,
+            ST_Distance(
+                geom,
+                ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+            ) AS dist_m
+        FROM drivable_vertices
+        ORDER BY geom <-> ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+        LIMIT 1;
+        """
+
+        def nearest_vertex(lng: float, lat: float, drivable_only: bool = False) -> Optional[dict]:
+            sql = nearest_drivable_sql if drivable_only else nearest_any_sql
+            cur.execute(sql, (lng, lat, lng, lat))
+            return cur.fetchone()
+
+        def build_path(start_vid: int, end_vid: int, mode_name: str) -> Optional[dict]:
+            cost_field = "cost_car_s" if mode_name == "car" else "cost_walk_s"
+            edge_sql = (
+                f"SELECT id, source, target, {cost_field} * traffic_factor AS cost "
+                f"FROM fuzhou_roads_clean WHERE {cost_field} >= 0"
+            )
+
+            route_sql = f"""
+            WITH route AS (
+                SELECT *
+                FROM pgr_dijkstra(
+                    '{edge_sql}',
+                    %s,
+                    %s,
+                    FALSE
+                )
+            )
+            SELECT
+                rt.seq,
+                rt.edge,
+                rt.cost,
+                r.traffic_factor,
+                ST_Length(r.geom) AS edge_distance_m,
+                ST_AsGeoJSON(ST_Transform(r.geom, 4326)) AS edge_geojson
+            FROM route rt
+            JOIN fuzhou_roads_clean r ON rt.edge = r.id
+            WHERE rt.edge <> -1
+            ORDER BY rt.seq;
+            """
+            cur.execute(route_sql, (start_vid, end_vid))
+            rows = cur.fetchall()
+            if not rows:
+                return None
+
+            features = []
+            total_cost_s = 0.0
+            total_distance_m = 0.0
+
+            for row in rows:
+                edge_cost = float(row.get("cost") or 0.0)
+                edge_distance = float(row.get("edge_distance_m") or 0.0)
+                traffic_factor = float(row.get("traffic_factor") or 1.0)
+                edge_geojson = row.get("edge_geojson")
+                if not edge_geojson:
+                    continue
+
+                total_cost_s += edge_cost
+                total_distance_m += edge_distance
+
+                features.append(
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "mode": mode_name,
+                            "segment_type": mode_name,
+                            "cost_seconds": edge_cost,
+                            "distance_m": edge_distance,
+                            "traffic_factor": traffic_factor,
+                        },
+                        "geometry": json.loads(edge_geojson),
+                    }
+                )
+
+            if not features:
+                return None
+
+            return {
+                "geojson": {
+                    "type": "FeatureCollection",
+                    "features": features,
+                },
+                "total_cost_s": total_cost_s,
+                "distance_m": total_distance_m,
+                "edge_count": len(features),
+            }
+
+        if mode == "walk":
+            start_vertex = nearest_vertex(start_lng, start_lat, drivable_only=False)
+            end_vertex = nearest_vertex(end_lng, end_lat, drivable_only=False)
+            if not start_vertex or not end_vertex:
+                return {"success": False, "message": "无法匹配到最近步行路网节点"}
+
+            start_vid = int(start_vertex["id"])
+            end_vid = int(end_vertex["id"])
+            walk_path = build_path(start_vid, end_vid, "walk")
+            if not walk_path:
+                return {
+                    "success": False,
+                    "message": "未找到可用步行路径，请尝试更换起终点",
+                    "start_vertex": start_vid,
+                    "end_vertex": end_vid,
+                }
+
+            return {
+                "success": True,
+                "mode": mode,
+                "start": {"lng": start_lng, "lat": start_lat, "vertex_id": start_vid},
+                "end": {"lng": end_lng, "lat": end_lat, "vertex_id": end_vid},
+                "total_cost_s": walk_path["total_cost_s"],
+                "total_duration_s": walk_path["total_cost_s"],
+                "distance_m": walk_path["distance_m"],
+                "duration_mins": round(walk_path["total_cost_s"] / 60.0, 2),
+                "eta_minutes": round(walk_path["total_cost_s"] / 60.0, 2),
+                "edge_count": walk_path["edge_count"],
+                "geojson": walk_path["geojson"],
+            }
+
+        # mode == "car": 最后一公里多模态
+        cur.execute(nearest_edge_cost_sql, (end_lng, end_lat))
+        nearest_edge_row = cur.fetchone()
+        if nearest_edge_row and nearest_edge_row.get("cost_car_s") == -1:
+            return {
+                "success": False,
+                "message": "目的地附近最近路段不允许驾车通行（cost_car_s = -1），请改用步行或调整终点",
+            }
+
+        start_car_vertex = nearest_vertex(start_lng, start_lat, drivable_only=True)
+        end_car_vertex = nearest_vertex(end_lng, end_lat, drivable_only=True)
+        end_walk_vertex = nearest_vertex(end_lng, end_lat, drivable_only=False)
+
+        if not start_car_vertex or not end_car_vertex or not end_walk_vertex:
+            return {"success": False, "message": "无法匹配到可驾车或步行路网节点"}
+
+        start_car_vid = int(start_car_vertex["id"])
+        end_car_vid = int(end_car_vertex["id"])
+        end_walk_vid = int(end_walk_vertex["id"])
+        last_mile_dist_m = float(end_car_vertex.get("dist_m") or 0.0)
+
+        car_path = build_path(start_car_vid, end_car_vid, "car")
+        if not car_path:
+            return {
+                "success": False,
+                "message": "未找到可用驾车路径，请尝试更换起终点",
+                "start_vertex": start_car_vid,
+                "end_vertex": end_car_vid,
+            }
+
+        walk_path = None
+        if last_mile_dist_m <= LAST_MILE_THRESHOLD_M and end_car_vid != end_walk_vid:
+            walk_path = build_path(end_car_vid, end_walk_vid, "walk")
+
+        features = list(car_path["geojson"].get("features", []))
+
+        total_cost_s = car_path["total_cost_s"]
+        total_distance_m = car_path["distance_m"]
+        total_edges = car_path["edge_count"]
+
+        if walk_path:
+            walk_features = walk_path["geojson"].get("features", [])
+            for feature in walk_features:
+                props = feature.setdefault("properties", {})
+                props["mode"] = "car"
+                props["segment_type"] = "walk"
+            features.extend(walk_features)
+            total_cost_s += walk_path["total_cost_s"]
+            total_distance_m += walk_path["distance_m"]
+            total_edges += walk_path["edge_count"]
+
+        return {
+            "success": True,
+            "mode": mode,
+            "start": {"lng": start_lng, "lat": start_lat, "vertex_id": start_car_vid},
+            "end": {"lng": end_lng, "lat": end_lat, "vertex_id": end_walk_vid},
+            "last_mile_threshold_m": LAST_MILE_THRESHOLD_M,
+            "last_mile_distance_m": round(last_mile_dist_m, 2),
+            "contains_last_mile_walk": bool(walk_path),
+            "total_cost_s": total_cost_s,
+            "total_duration_s": total_cost_s,
+            "distance_m": total_distance_m,
+            "duration_mins": round(total_cost_s / 60.0, 2),
+            "eta_minutes": round(total_cost_s / 60.0, 2),
+            "edge_count": total_edges,
+            "geojson": {
+                "type": "FeatureCollection",
+                "features": features,
+            },
+        }
+    except psycopg2.Error as exc:
+        return {"success": False, "message": f"路径计算失败: {exc}"}
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def parse_polyline(polyline: str) -> List[List[float]]:
+    coords: List[List[float]] = []
+    if not polyline:
+        return coords
+
+    for pair in polyline.split(";"):
+        parts = pair.split(",")
+        if len(parts) != 2:
+            continue
+        try:
+            lng = float(parts[0])
+            lat = float(parts[1])
+        except ValueError:
+            continue
+        coords.append([lng, lat])
+    return coords
+
+
+def call_amap(api: str, params: Dict[str, str]) -> dict:
+    if not AMAP_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="未配置高德地图 Key，请设置环境变量 AMAP_KEY 后重试。",
+        )
+
+    query = {"key": AMAP_KEY, **params}
+    url = f"https://restapi.amap.com{api}?{urlencode(query)}"
+
+    try:
+        with urlopen(url, timeout=12) as resp:
+            body = resp.read().decode("utf-8")
+            payload = json.loads(body)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"路径服务调用失败: {exc}")
+
+    if payload.get("status") != "1":
+        raise HTTPException(
+            status_code=502,
+            detail=f"路径服务返回错误: {payload.get('info', '未知错误')}",
+        )
+
+    return payload
+
+
+def call_osrm(profile: str, origin_lng: float, origin_lat: float, dest_lng: float, dest_lat: float) -> dict:
+    if profile not in ("driving", "walking"):
+        raise HTTPException(status_code=400, detail="不支持的路线模式")
+
+    query = urlencode(
+        {
+            "overview": "full",
+            "alternatives": "true",
+            "geometries": "geojson",
+            "steps": "true",
+        }
+    )
+    url = (
+        "https://router.project-osrm.org/route/v1/"
+        f"{profile}/{origin_lng},{origin_lat};{dest_lng},{dest_lat}?{query}"
+    )
+
+    try:
+        with urlopen(url, timeout=12) as resp:
+            body = resp.read().decode("utf-8")
+            payload = json.loads(body)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"OSRM 路径服务调用失败: {exc}")
+
+    if payload.get("code") != "Ok":
+        raise HTTPException(
+            status_code=502,
+            detail=f"OSRM 路径服务返回错误: {payload.get('message', '未知错误')}",
+        )
+
+    return payload
+
+
+def classify_traffic_by_speed(speed_kmh: float) -> str:
+    if speed_kmh >= 35:
+        return "畅通"
+    if speed_kmh >= 20:
+        return "缓行"
+    if speed_kmh >= 10:
+        return "拥堵"
+    return "严重拥堵"
+
+
+@app.get("/api/categories")
+async def get_categories():
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            SELECT DISTINCT category
+            FROM fuzhou_poi_clean
+            WHERE category IS NOT NULL AND category <> ''
+            ORDER BY category;
+            """
+        )
+        rows = cur.fetchall()
+        return {"data": [row["category"] for row in rows]}
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"分类查询失败: {exc}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+@app.get("/api/search")
+async def search_poi(
+    keyword: str = Query(..., min_length=1, description="按地点名称模糊匹配"),
+    category: Optional[str] = Query(None, description="按类型过滤"),
+    limit: int = Query(20, ge=1, le=100),
+):
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        kw = keyword.strip()
+        if not kw:
+            return {"data": []}
+
+        if category:
+            sql = """
+            SELECT name, category, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geometry
+            FROM fuzhou_poi_clean
+            WHERE category = %s
+              AND name ILIKE %s
+            ORDER BY CASE WHEN name ILIKE %s THEN 0 ELSE 1 END, name
+            LIMIT %s;
+            """
+            cur.execute(sql, (category, f"%{kw}%", f"{kw}%", limit))
+        else:
+            sql = """
+            SELECT name, category, ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geometry
+            FROM fuzhou_poi_clean
+            WHERE name ILIKE %s
+            ORDER BY CASE WHEN name ILIKE %s THEN 0 ELSE 1 END, name
+            LIMIT %s;
+            """
+            cur.execute(sql, (f"%{kw}%", f"{kw}%", limit))
+
+        return {"data": cur.fetchall()}
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"地点搜索失败: {exc}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+@app.get("/api/nearby")
+async def nearby_poi(
+    lng: float = Query(..., description="当前位置经度"),
+    lat: float = Query(..., description="当前位置纬度"),
+    radius: int = Query(2000, ge=100, le=20000, description="搜索半径，单位米"),
+    category: Optional[str] = Query(None, description="按类型过滤"),
+    limit: int = Query(100, ge=1, le=500),
+):
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        sql = """
+        SELECT
+            name,
+            category,
+            ST_AsGeoJSON(ST_Transform(geom, 4326)) AS geometry,
+            ST_Distance(
+                ST_Transform(geom, 4326)::geography,
+                ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography
+            ) AS distance_m
+        FROM fuzhou_poi_clean
+        WHERE (%s IS NULL OR category = %s)
+          AND ST_DWithin(
+                ST_Transform(geom, 4326)::geography,
+                ST_SetSRID(ST_MakePoint(%s, %s), 4326)::geography,
+                %s
+          )
+        ORDER BY distance_m ASC
+        LIMIT %s;
+        """
+        cur.execute(sql, (lng, lat, category, category, lng, lat, radius, limit))
+
+        rows = cur.fetchall()
+        for row in rows:
+            row["distance_m"] = round(float(row.get("distance_m") or 0.0), 1)
+
+        return {
+            "data": rows,
+            "radius_m": radius,
+            "center": {"lng": lng, "lat": lat},
+        }
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"附近地点查询失败: {exc}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+@app.post("/api/analyze")
+async def analyze(payload: dict = Body(...)):
+    geojson = payload["geojson"]
+    search_type = payload["type"]
+    categories: List[str] = payload.get("categories", [])
+
+    if not categories:
+        return {"data": []}
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        geom_json = json.dumps(geojson["geometry"])
+
+        if search_type == "polygon":
+            sql = """
+            SELECT name, category, ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
+            FROM fuzhou_poi_clean
+            WHERE category = ANY(%s)
+              AND ST_Intersects(geom, ST_Transform(ST_GeomFromGeoJSON(%s), 3857))
+            LIMIT 20;
+            """
+            cur.execute(sql, (categories, geom_json))
+        else:
+            sql = """
+            SELECT name, category, ST_AsGeoJSON(ST_Transform(geom, 4326)) as geometry
+            FROM fuzhou_poi_clean
+            WHERE category = ANY(%s)
+            ORDER BY geom <-> ST_Transform(ST_GeomFromGeoJSON(%s), 3857)
+            LIMIT 10;
+            """
+            cur.execute(sql, (categories, geom_json))
+
+        results = cur.fetchall()
+        return {"data": results}
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"分析查询失败: {exc}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+@app.get("/api/route")
+async def plan_route(
+    origin_lng: float = Query(...),
+    origin_lat: float = Query(...),
+    dest_lng: float = Query(...),
+    dest_lat: float = Query(...),
+    mode: str = Query("driving", pattern="^(driving|walking)$"),
+):
+    origin = f"{origin_lng},{origin_lat}"
+    destination = f"{dest_lng},{dest_lat}"
+
+    normalized_paths = []
+
+    if AMAP_KEY:
+        if mode == "driving":
+            payload = call_amap(
+                "/v3/direction/driving",
+                {
+                    "origin": origin,
+                    "destination": destination,
+                    "extensions": "all",
+                    "strategy": "0",
+                    "output": "json",
+                },
+            )
+        else:
+            payload = call_amap(
+                "/v3/direction/walking",
+                {
+                    "origin": origin,
+                    "destination": destination,
+                    "output": "json",
+                },
+            )
+
+        paths = payload.get("route", {}).get("paths", [])
+        if not paths:
+            raise HTTPException(status_code=404, detail="未查询到可用路线")
+
+        for path in paths:
+            distance_m = float(path.get("distance") or 0.0)
+            duration_s = float(path.get("duration") or 0.0)
+            steps = path.get("steps") or []
+
+            segments = []
+            traffic_counter: Dict[str, int] = {}
+
+            if mode == "driving":
+                for step in steps:
+                    tmcs = step.get("tmcs") or []
+                    if tmcs:
+                        for tmc in tmcs:
+                            status = tmc.get("status") or "未知"
+                            traffic_counter[status] = traffic_counter.get(status, 0) + 1
+                            coords = parse_polyline(tmc.get("polyline") or "")
+                            if coords:
+                                segments.append(
+                                    {
+                                        "status": status,
+                                        "coords": coords,
+                                    }
+                                )
+                    else:
+                        coords = parse_polyline(step.get("polyline") or "")
+                        if coords:
+                            status = "未知"
+                            traffic_counter[status] = traffic_counter.get(status, 0) + 1
+                            segments.append(
+                                {
+                                    "status": status,
+                                    "coords": coords,
+                                }
+                            )
+            else:
+                for step in steps:
+                    coords = parse_polyline(step.get("polyline") or "")
+                    if coords:
+                        segments.append(
+                            {
+                                "status": "步行",
+                                "coords": coords,
+                            }
+                        )
+
+            normalized_paths.append(
+                {
+                    "distance_m": round(distance_m, 1),
+                    "duration_s": round(duration_s, 1),
+                    "strategy": path.get("strategy", ""),
+                    "traffic": traffic_counter,
+                    "segments": segments,
+                }
+            )
+    else:
+        profile = "driving" if mode == "driving" else "walking"
+        payload = call_osrm(profile, origin_lng, origin_lat, dest_lng, dest_lat)
+        routes = payload.get("routes") or []
+        if not routes:
+            raise HTTPException(status_code=404, detail="未查询到可用路线")
+
+        for route in routes:
+            coords = (route.get("geometry") or {}).get("coordinates") or []
+            distance_m = float(route.get("distance") or 0.0)
+            duration_s = float(route.get("duration") or 0.0)
+
+            if mode == "driving":
+                speed_kmh = (distance_m / duration_s) * 3.6 if duration_s > 0 else 0.0
+                status = classify_traffic_by_speed(speed_kmh)
+                traffic_counter = {status: 1}
+            else:
+                status = "步行"
+                traffic_counter = {}
+
+            normalized_paths.append(
+                {
+                    "distance_m": round(distance_m, 1),
+                    "duration_s": round(duration_s, 1),
+                    "strategy": "OSRM",
+                    "traffic": traffic_counter,
+                    "segments": [
+                        {
+                            "status": status,
+                            "coords": coords,
+                        }
+                    ],
+                }
+            )
+
+    return {
+        "mode": mode,
+        "origin": {"lng": origin_lng, "lat": origin_lat},
+        "destination": {"lng": dest_lng, "lat": dest_lat},
+        "provider": "amap" if AMAP_KEY else "osrm",
+        "paths": normalized_paths,
+    }
+
+
+@app.get("/api/route_shortest")
+async def route_shortest(
+    origin_lng: float = Query(..., description="起点经度，4326"),
+    origin_lat: float = Query(..., description="起点纬度，4326"),
+    dest_lng: float = Query(..., description="终点经度，4326"),
+    dest_lat: float = Query(..., description="终点纬度，4326"),
+    mode: str = Query("car", pattern="^(car|walk)$"),
+):
+    result = get_shortest_path((origin_lng, origin_lat), (dest_lng, dest_lat), mode)
+    if not result.get("success"):
+        message = result.get("message", "最短路径计算失败")
+        status_code = 404 if "未找到可用路径" in message else 400
+        raise HTTPException(status_code=status_code, detail=message)
+    return result
+
+
+@app.get("/api/isochrone")
+async def isochrone(
+    lng: float = Query(..., description="中心点经度，4326"),
+    lat: float = Query(..., description="中心点纬度，4326"),
+    mode: str = Query("car", pattern="^(car|walk)$"),
+    time_limit: int = Query(1800, ge=60, le=14400, description="时间阈值，单位秒"),
+):
+    cost_field = "cost_car_s" if mode == "car" else "cost_walk_s"
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        nearest_vertex_sql = """
+        SELECT id
+        FROM fuzhou_roads_vertices
+        ORDER BY geom <-> ST_Transform(ST_SetSRID(ST_MakePoint(%s, %s), 4326), 3857)
+        LIMIT 1;
+        """
+        cur.execute(nearest_vertex_sql, (lng, lat))
+        nearest_row = cur.fetchone()
+        if not nearest_row:
+            raise HTTPException(status_code=404, detail="未找到可用起始节点")
+
+        start_vid = int(nearest_row["id"])
+        edge_sql = (
+            f"SELECT id, source, target, {cost_field} AS cost "
+            f"FROM fuzhou_roads_clean WHERE {cost_field} >= 0"
+        )
+
+        isochrone_sql = f"""
+        WITH reachable AS (
+            SELECT node, cost
+            FROM pgr_drivingDistance(
+                '{edge_sql}',
+                %s,
+                %s,
+                FALSE
+            )
+        ),
+        pts AS (
+            SELECT v.id, v.geom, r.cost
+            FROM reachable r
+            JOIN fuzhou_roads_vertices v ON v.id = r.node
+        ),
+        hull AS (
+            SELECT
+                CASE
+                    WHEN COUNT(*) >= 3 THEN ST_ConcaveHull(ST_Collect(geom), 0.90, TRUE)
+                    WHEN COUNT(*) = 2 THEN ST_Buffer(ST_Envelope(ST_Collect(geom)), 35)
+                    WHEN COUNT(*) = 1 THEN ST_Buffer(ST_Collect(geom), 35)
+                    ELSE NULL
+                END AS geom,
+                COUNT(*) AS node_count,
+                COALESCE(MAX(cost), 0) AS max_cost_s
+            FROM pts
+        )
+        SELECT
+            ST_AsGeoJSON(ST_Transform(ST_MakeValid(geom), 4326)) AS polygon_geojson,
+            node_count,
+            max_cost_s
+        FROM hull
+        WHERE geom IS NOT NULL;
+        """
+        cur.execute(isochrone_sql, (start_vid, time_limit))
+        row = cur.fetchone()
+        if not row or not row.get("polygon_geojson"):
+            raise HTTPException(status_code=404, detail="未生成有效服务区，请扩大时间阈值重试")
+
+        polygon_geometry = json.loads(row["polygon_geojson"])
+        feature = {
+            "type": "Feature",
+            "properties": {
+                "mode": mode,
+                "time_limit_s": time_limit,
+                "node_count": int(row.get("node_count") or 0),
+                "max_cost_s": float(row.get("max_cost_s") or 0.0),
+                "start_vertex": start_vid,
+            },
+            "geometry": polygon_geometry,
+        }
+
+        return {
+            "success": True,
+            "mode": mode,
+            "time_limit_s": time_limit,
+            "center": {"lng": lng, "lat": lat},
+            "geojson": {
+                "type": "FeatureCollection",
+                "features": [feature],
+            },
+        }
+    except psycopg2.Error as exc:
+        raise HTTPException(status_code=500, detail=f"服务区分析失败: {exc}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
+
+============================================================
+
+==================== FILE: requirements.txt ====================
+
+
+
+============================================================
+
+==================== FILE: static\index.html ====================
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>福州路网分析工具</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    <style>
+        :root {
+            --sidebar-w: 340px;
+            --bg-1: #eff8f4;
+            --bg-2: #e8f2ff;
+            --ink: #1f2b37;
+            --muted: #5f7487;
+            --line: #d7e2ec;
+            --card: rgba(255, 255, 255, 0.86);
+            --blue: #2672ff;
+            --blue-dark: #1f5fd0;
+            --green: #1f9d62;
+            --danger: #fbe6e8;
+            --danger-ink: #b33b48;
+            --shadow: 0 12px 32px rgba(23, 55, 94, 0.16);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(1100px 500px at -12% -20%, #d1efe3 20%, transparent 65%),
+                radial-gradient(1000px 420px at 112% -15%, #cee2ff 16%, transparent 60%),
+                linear-gradient(165deg, var(--bg-1), var(--bg-2));
+        }
+
+        #map {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: calc(var(--sidebar-w) + 16px);
+            bottom: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #top-header {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: calc(var(--sidebar-w) + 20px);
+            z-index: 2100;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: var(--card);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            transition: box-shadow 220ms ease;
+        }
+
+        #top-header:hover {
+            box-shadow: 0 14px 36px rgba(23, 55, 94, 0.2);
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-right: 8px;
+            white-space: nowrap;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5d748a;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        #poi-search,
+        #category-select {
+            border: 1px solid #bfd0e2;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.88);
+            color: var(--ink);
+            outline: none;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 6px 18px rgba(32, 70, 112, 0.08);
+            transition: border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        #poi-search {
+            flex: 1;
+            min-width: 180px;
+            width: 100%;
+            padding-left: 34px;
+        }
+
+        #poi-search:focus,
+        #category-select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(38, 114, 255, 0.15);
+        }
+
+        .btn-help {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            color: #1a5a9c;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #cdd9e6;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 120ms ease, filter 120ms ease, background 160ms ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: saturate(1.04);
+        }
+
+        .btn-search {
+            color: #fff;
+            background: linear-gradient(130deg, var(--blue), var(--blue-dark));
+        }
+
+        .btn-locate {
+            color: #fff;
+            background: linear-gradient(130deg, #2a9676, #208d93);
+        }
+
+        .btn-clear {
+            color: var(--danger-ink);
+            background: var(--danger);
+            border: 1px solid #f2c9d0;
+        }
+
+        #search-results {
+            position: absolute;
+            top: 66px;
+            left: 0;
+            right: 0;
+            margin: 0;
+            padding: 8px;
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: var(--shadow);
+            max-height: 400px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: none;
+            z-index: 25000;
+        }
+
+        #search-results.show {
+            display: block;
+        }
+
+        #search-results li {
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            transition: background 160ms ease;
+        }
+
+        #search-results li:hover {
+            background: #edf4ff;
+        }
+
+        #search-results li span {
+            color: var(--muted);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        #floating-panel {
+            position: absolute;
+            top: 96px;
+            left: 16px;
+            z-index: 2050;
+            width: min(340px, calc(100vw - 32px));
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.84);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        #poi-result-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            z-index: 2300;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(8px);
+            border-left: 1px solid #dfe7ef;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            box-shadow: -10px 0 22px rgba(23, 55, 94, 0.12);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 14px 14px 18px;
+        }
+
+        .sidebar-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .sidebar-subtitle {
+            margin: 3px 0 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .sidebar-empty {
+            border: 1px dashed #d5e0ec;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            background: #f8fbff;
+        }
+
+        .category-group {
+            border: 1px solid #e0e8f1;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            background: #fbfdff;
+        }
+
+        .category-header {
+            padding: 9px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2f4458;
+            background: #eef5ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-count {
+            color: #5f7487;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .poi-item {
+            padding: 9px 10px;
+            border-top: 1px solid #edf2f8;
+            cursor: default;
+            transition: background 140ms ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .poi-item:hover {
+            background: #f2f8ff;
+        }
+
+        .poi-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .poi-meta {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .poi-item-main {
+            min-width: 0;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .poi-nav-btn {
+            border: 1px solid #bfd0e5;
+            border-radius: 9px;
+            background: rgba(238, 245, 255, 0.95);
+            color: #1f4d8e;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 8px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 150ms ease;
+        }
+
+        .poi-nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(38, 88, 146, 0.18);
+        }
+
+        .poi-pin {
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+        }
+
+        .poi-pin.medical { background: #d64545; }
+        .poi-pin.education { background: #2f74dc; }
+        .poi-pin.leisure { background: #1f9d62; }
+        .poi-pin.default { background: #6b7f95; }
+
+        .panel-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .panel-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .panel-row label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        #radius-input {
+            width: 100px;
+            border: 1px solid #bfd0e2;
+            border-radius: 10px;
+            padding: 7px 8px;
+            background: #fff;
+        }
+
+        .switch-row {
+            display: flex;
+            gap: 14px;
+            font-size: 13px;
+        }
+
+        .switch-row label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .metrics {
+            border: 1px solid #dce6f0;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 8px 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .metrics strong {
+            font-weight: 800;
+        }
+
+        .iso-panel {
+            border: 1px solid #d7e4f0;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 8px 24px rgba(26, 58, 94, 0.11);
+            padding: 10px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .iso-mode-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mode-chip {
+            border: 1px solid #c8d7e8;
+            border-radius: 999px;
+            background: rgba(245, 250, 255, 0.88);
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2e4861;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .iso-time-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .iso-time-btn {
+            border: 1px solid #c8d6e8;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.86);
+            padding: 7px 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #35506b;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease;
+        }
+
+        .iso-time-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(33, 63, 98, 0.16);
+        }
+
+        .iso-time-btn.active {
+            border-color: #7454cc;
+            color: #3f2d71;
+            box-shadow: 0 0 0 3px rgba(116, 84, 204, 0.16);
+            background: rgba(245, 239, 255, 0.95);
+        }
+
+        .iso-time-btn.active::after {
+            content: '●';
+            margin-left: 6px;
+            font-size: 10px;
+            color: #5f3fb5;
+        }
+
+        .iso-hint {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        #error-banner {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 2200;
+            background: #fff2f2;
+            border: 1px solid #ffc9c9;
+            color: #9e2020;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            display: none;
+        }
+
+        #error-banner.show {
+            display: block;
+        }
+
+        #help-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(21, 35, 54, 0.3);
+            z-index: 3000;
+            padding: 16px;
+        }
+
+        #help-modal.show {
+            display: flex;
+        }
+
+        .help-card {
+            width: min(560px, 100%);
+            max-height: 86vh;
+            overflow: auto;
+            border-radius: 12px;
+            border: 1px solid #d7e2ec;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .help-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .help-close {
+            border: 1px solid #bfd0e2;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2f4f70;
+            font-weight: 800;
+            font-size: 13px;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+
+        .footstep-marker {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            border: 1px solid #d9e5f1;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 5px 16px rgba(35, 61, 92, 0.22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .help-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .help-subtitle {
+            margin: 0 0 10px;
+            color: #5b7187;
+            font-size: 13px;
+        }
+
+        .help-section {
+            border: 1px solid #dbe6f2;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.74);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .help-section h4 {
+            margin: 0 0 7px;
+            font-size: 14px;
+            color: #27425a;
+        }
+
+        .help-list {
+            margin: 0;
+            padding-left: 18px;
+            color: #2a3f54;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .help-list li { margin-bottom: 4px; }
+
+        .traffic-legend {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0 12px;
+            flex-wrap: wrap;
+        }
+
+        .legend-chip {
+            border-radius: 12px;
+            border: 1px solid #d8e2ec;
+            padding: 6px 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.75);
+        }
+
+        .legend-chip .line {
+            width: 18px;
+            height: 3px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .line-blue { background: #174a8b; }
+        .line-orange { background: #df7a1a; }
+        .line-red { background: #d63232; }
+
+        .help-actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .iso-legend-grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .iso-chip {
+            border: 1px solid #d8e2ec;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 12px;
+            line-height: 1.55;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .iso-chip .swatch {
+            width: 16px;
+            height: 12px;
+            display: inline-block;
+            border-radius: 4px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .swatch-15 { background: rgba(75, 29, 149, 0.6); }
+        .swatch-30 { background: rgba(115, 80, 200, 0.48); }
+        .swatch-60 { background: rgba(211, 161, 69, 0.34); }
+        .swatch-120 { background: rgba(245, 232, 163, 0.22); }
+
+        .to-here-btn {
+            margin-top: 6px;
+            width: 100%;
+            border: 1px solid #c9d7e7;
+            border-radius: 10px;
+            background: #eef5ff;
+            color: #1c4f92;
+            padding: 6px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 900px) {
+            :root {
+                --sidebar-w: 0px;
+            }
+
+            #top-header {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                padding: 10px;
+            }
+
+            #floating-panel {
+                top: 150px;
+                left: 10px;
+                width: min(340px, calc(100vw - 20px));
+            }
+
+            #map {
+                inset: 10px;
+            }
+
+            #search-results {
+                top: 62px;
+                max-height: 300px;
+            }
+
+            #poi-result-sidebar {
+                top: auto;
+                right: 10px;
+                left: 10px;
+                bottom: 10px;
+                width: auto;
+                height: 34vh;
+                border-radius: 12px;
+                border: 1px solid #dfe7ef;
+                box-shadow: 0 -6px 22px rgba(23, 55, 94, 0.14);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="top-header">
+        <button id="help-btn" class="btn btn-help" type="button" title="帮助">💡</button>
+        <div class="title">福州路网分析</div>
+        <div class="search-wrap">
+            <div class="search-input-wrap">
+                <span class="search-icon">🔎</span>
+                <input id="poi-search" type="text" placeholder="输入地点名称，例如：公园、学校、医院" />
+            </div>
+            <select id="category-select">
+                <option value="">全部类型</option>
+                <option value="休闲服务">休闲服务</option>
+                <option value="教育科研">教育科研</option>
+                <option value="医疗卫生">医疗卫生</option>
+            </select>
+            <button id="search-btn" class="btn btn-search" type="button">搜索</button>
+            <ul id="search-results"></ul>
+        </div>
+    </div>
+
+    <div id="floating-panel">
+        <h3 class="panel-title">路径与图层控制</h3>
+        <div class="panel-row">
+            <button id="locate-btn" class="btn btn-locate" type="button">点击选择虚拟地点</button>
+            <button id="clear-route-btn" class="btn btn-clear" type="button">清除路线</button>
+        </div>
+        <div class="panel-row">
+            <label for="radius-input">缓冲区(米)</label>
+            <input id="radius-input" type="number" min="100" max="20000" value="2000" step="100" />
+        </div>
+        <div class="switch-row">
+            <label><input id="toggle-car" type="checkbox" checked />显示驾车路径</label>
+            <label><input id="toggle-walk" type="checkbox" checked />显示步行路径</label>
+        </div>
+        <div id="route-metrics" class="metrics">
+            <div><strong>驾车总路程 (km):</strong> -</div>
+            <div><strong>驾车预计时间:</strong> -</div>
+            <div><strong>步行总路程 (m):</strong> -</div>
+            <div><strong>步行预计时间:</strong> -</div>
+        </div>
+
+        <div class="iso-panel">
+            <h3 class="panel-title">服务区分析</h3>
+            <div class="iso-mode-row">
+                <label class="mode-chip"><input id="iso-mode-car" type="checkbox" checked />驾车可达性</label>
+                <label class="mode-chip"><input id="iso-mode-walk" type="checkbox" />步行可达性</label>
+            </div>
+            <div class="iso-time-grid">
+                <button class="iso-time-btn" data-seconds="900" type="button">15 min</button>
+                <button class="iso-time-btn" data-seconds="1800" type="button">30 min</button>
+                <button class="iso-time-btn" data-seconds="3600" type="button">60 min</button>
+                <button class="iso-time-btn" data-seconds="7200" type="button">120 min</button>
+            </div>
+            <div class="iso-hint">先设置虚拟起点，再点击时间按钮进行显示/隐藏。支持多层级叠加热力展示。</div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <aside id="poi-result-sidebar">
+        <h3 class="sidebar-title">缓冲区 POI 结果</h3>
+        <p class="sidebar-subtitle">半径: <span id="sidebar-radius-value">2000</span> 米</p>
+        <div id="poi-group-list" class="sidebar-empty">请先在地图中选择虚拟起点，系统会自动查询附近点位。</div>
+    </aside>
+
+    <div id="help-modal" role="dialog" aria-modal="true" aria-label="帮助说明">
+        <div class="help-card">
+            <div class="help-header">
+                <h3 class="help-title">城市路网大数据应用指南</h3>
+                <button id="close-help-btn-top" class="help-close" type="button">关闭 ✕</button>
+            </div>
+            <p class="help-subtitle">快速掌握路况、路径、POI 和可达性热力叠加规则。</p>
+
+            <section class="help-section">
+                <h4>1. 路况颜色说明</h4>
+                <div class="traffic-legend">
+                    <span class="legend-chip"><span class="line line-blue"></span>蓝色: 畅通 (factor &lt; 1.2)</span>
+                    <span class="legend-chip"><span class="line line-orange"></span>橙色: 缓行 (1.2-2.0)</span>
+                    <span class="legend-chip"><span class="line line-red"></span>红色: 极度拥堵 (&gt; 2.0)</span>
+                </div>
+            </section>
+
+            <section class="help-section">
+                <h4>2. 图标与 POI 含义</h4>
+                <ul class="help-list">
+                    <li>✚ 红十字代表医疗卫生，📘 书本代表教育科研，🟢🌿 叶子代表休闲服务。</li>
+                    <li>右侧 POI 列表支持“导航到此”一键发起路径规划。</li>
+                </ul>
+            </section>
+
+            <section class="help-section">
+                <h4>3. 路径控制说明</h4>
+                <ul class="help-list">
+                    <li>先在地图设置虚拟起点，再选择 POI 或使用“导航到这里”按钮。</li>
+                    <li>图层可独立开关，👣 绿色虚线代表步行路径，实线代表驾车路径。</li>
+                </ul>
+            </section>
+
+            <section class="help-section">
+                <h4>4. 可达性分析（等时圈）</h4>
+                <div class="iso-legend-grid">
+                    <div class="iso-chip"><span class="swatch swatch-15"></span><strong>15min</strong><br/>颜色 #4b1d95，透明度 0.60</div>
+                    <div class="iso-chip"><span class="swatch swatch-30"></span><strong>30min</strong><br/>颜色 #7350c8，透明度 0.48</div>
+                    <div class="iso-chip"><span class="swatch swatch-60"></span><strong>60min</strong><br/>颜色 #d3a145，透明度 0.34</div>
+                    <div class="iso-chip"><span class="swatch swatch-120"></span><strong>120min</strong><br/>颜色 #f5e8a3，透明度 0.22</div>
+                </div>
+                <ul class="help-list">
+                    <li>多个时间层叠加后会形成由中心向外扩散的热力图视觉效果。</li>
+                    <li>驾车和步行可达性分析互斥，同时只能启用一种模式。</li>
+                </ul>
+            </section>
+
+            <div class="help-actions">
+                <button id="close-help-btn" class="btn btn-search" type="button">我知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-banner"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script>
+        const map = L.map('map').setView([26.07, 119.23], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const drawnItems = new L.FeatureGroup().addTo(map);
+        const userMarker = L.layerGroup().addTo(map);
+        const resultLayer = L.layerGroup().addTo(map);
+        const carRouteLayer = L.layerGroup().addTo(map);
+        const walkRouteLayer = L.layerGroup().addTo(map);
+
+        const searchInput = document.getElementById('poi-search');
+        const searchBtn = document.getElementById('search-btn');
+        const categorySelect = document.getElementById('category-select');
+        const searchResultsEl = document.getElementById('search-results');
+        const errorBanner = document.getElementById('error-banner');
+        const poiGroupList = document.getElementById('poi-group-list');
+        const sidebarRadiusValue = document.getElementById('sidebar-radius-value');
+        const locateBtn = document.getElementById('locate-btn');
+        const radiusInput = document.getElementById('radius-input');
+        const clearRouteBtn = document.getElementById('clear-route-btn');
+        const toggleCar = document.getElementById('toggle-car');
+        const toggleWalk = document.getElementById('toggle-walk');
+        const routeMetrics = document.getElementById('route-metrics');
+        const helpBtn = document.getElementById('help-btn');
+        const helpModal = document.getElementById('help-modal');
+        const closeHelpBtn = document.getElementById('close-help-btn');
+        const closeHelpBtnTop = document.getElementById('close-help-btn-top');
+        const isoModeCar = document.getElementById('iso-mode-car');
+        const isoModeWalk = document.getElementById('iso-mode-walk');
+        const isoTimeButtons = Array.from(document.querySelectorAll('.iso-time-btn'));
+
+        const ISO_LEVELS = [900, 1800, 3600, 7200];
+        const ISO_STYLE_BY_LEVEL = {
+            900: { fillColor: '#4b1d95', fillOpacity: 0.6, color: '#452181', weight: 1.4 },
+            1800: { fillColor: '#7350c8', fillOpacity: 0.48, color: '#6f4dbc', weight: 1.4 },
+            3600: { fillColor: '#d3a145', fillOpacity: 0.34, color: '#bb8b30', weight: 1.2 },
+            7200: { fillColor: '#f5e8a3', fillOpacity: 0.22, color: '#d7c26d', weight: 1.1 }
+        };
+
+        let currentResults = [];
+        let currentLocation = null;
+        let destinationPoi = null;
+        let isPickingVirtualLocation = false;
+        let currentRadius = Number(radiusInput.value) || 2000;
+        let poiMarkerByKey = new Map();
+        const isochroneLayers = { car: {}, walk: {} };
+        const isochroneState = { car: {}, walk: {} };
+
+        function debounce(fn, waitMs = 300) {
+            let timer = null;
+            return (...args) => {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(() => fn(...args), waitMs);
+            };
+        }
+
+        function categoryStyle(category) {
+            if (!category) {
+                return { key: 'default', icon: '•', labelIcon: '📍' };
+            }
+            if (category.includes('医疗')) {
+                return { key: 'medical', icon: '✚', labelIcon: '🩺' };
+            }
+            if (category.includes('教育') || category.includes('科研')) {
+                return { key: 'education', icon: '📘', labelIcon: '📘' };
+            }
+            if (category.includes('休闲')) {
+                return { key: 'leisure', icon: '🌿', labelIcon: '🌿' };
+            }
+            return { key: 'default', icon: '•', labelIcon: '📍' };
+        }
+
+        function getPoiKey(item, coords) {
+            return `${item.name || '未命名'}|${coords[0].toFixed(6)}|${coords[1].toFixed(6)}`;
+        }
+
+        function showError(msg) {
+            errorBanner.textContent = msg;
+            errorBanner.classList.add('show');
+        }
+
+        function hideError() {
+            errorBanner.classList.remove('show');
+            errorBanner.textContent = '';
+        }
+
+        async function parseApiResponse(response, fallbackMsg) {
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(payload.detail || fallbackMsg);
+            }
+            return payload;
+        }
+
+        function formatDurationByMinutes(minutes) {
+            const total = Math.max(0, Math.round(Number(minutes) || 0));
+            const h = Math.floor(total / 60);
+            const m = total % 60;
+            if (h > 0) {
+                return `${h}小时${m}分钟`;
+            }
+            return `${m}分钟`;
+        }
+
+        function formatDistanceMeters(meters) {
+            const v = Number(meters) || 0;
+            if (v >= 1000) {
+                return `${(v / 1000).toFixed(2)} km`;
+            }
+            return `${Math.round(v)} m`;
+        }
+
+        function trafficColorByFactor(factorValue) {
+            const factor = Number(factorValue);
+            if (factor > 2.0) {
+                return '#d63232';
+            }
+            if (factor >= 1.2) {
+                return '#df7a1a';
+            }
+            return '#174a8b';
+        }
+
+        function extractLatLng(target) {
+            if (!target) {
+                return null;
+            }
+
+            if (typeof target.lat === 'number' && typeof target.lng === 'number') {
+                return L.latLng(target.lat, target.lng);
+            }
+
+            if (Array.isArray(target) && target.length >= 2) {
+                const lng = Number(target[0]);
+                const lat = Number(target[1]);
+                if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                    return L.latLng(lat, lng);
+                }
+            }
+
+            if (
+                target.geometry &&
+                target.geometry.type === 'Point' &&
+                Array.isArray(target.geometry.coordinates)
+            ) {
+                const [lng, lat] = target.geometry.coordinates;
+                if (Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))) {
+                    return L.latLng(Number(lat), Number(lng));
+                }
+            }
+
+            return null;
+        }
+
+        window.to_here = function toHere(inputLat, inputLng) {
+            let latlng = null;
+            if (arguments.length === 2) {
+                const lat = Number(inputLat);
+                const lng = Number(inputLng);
+                if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                    latlng = L.latLng(lat, lng);
+                }
+            } else {
+                latlng = extractLatLng(inputLat);
+            }
+
+            if (!latlng) {
+                showError('定位失败: 目标不是有效经纬度坐标。');
+                return;
+            }
+
+            map.panTo(latlng);
+            destinationPoi = {
+                name: '临时终点',
+                category: '未分类',
+                geometry: JSON.stringify({
+                    type: 'Point',
+                    coordinates: [latlng.lng, latlng.lat]
+                })
+            };
+            if (currentLocation) {
+                requestRoute();
+            }
+        };
+
+        function sumDistanceBySegment(payload, segmentType) {
+            if (!payload || !payload.geojson || !Array.isArray(payload.geojson.features)) {
+                return 0;
+            }
+            return payload.geojson.features.reduce((acc, feature) => {
+                const props = feature && feature.properties ? feature.properties : {};
+                if (props.segment_type !== segmentType) {
+                    return acc;
+                }
+                return acc + (Number(props.distance_m) || 0);
+            }, 0);
+        }
+
+        function updateMetrics(carPayload, walkPayload) {
+            const carDistanceMeters = carPayload
+                ? (sumDistanceBySegment(carPayload, 'car') || Number(carPayload.distance_m) || 0)
+                : 0;
+            const walkDistanceMeters = walkPayload ? (Number(walkPayload.distance_m) || 0) : 0;
+            const carEtaMinutes = carPayload ? Number(carPayload.eta_minutes ?? carPayload.duration_mins ?? 0) : 0;
+            const walkEtaMinutes = walkPayload ? Number(walkPayload.eta_minutes ?? walkPayload.duration_mins ?? 0) : 0;
+
+            const carDistance = carPayload ? `${(carDistanceMeters / 1000).toFixed(2)} km` : '-';
+            const walkDistance = walkPayload ? `${Math.round(walkDistanceMeters)} m` : '-';
+            const carDuration = carPayload ? formatDurationByMinutes(carEtaMinutes) : '-';
+            const walkDuration = walkPayload ? formatDurationByMinutes(walkEtaMinutes) : '-';
+
+            routeMetrics.innerHTML = `
+                <div><strong>驾车总路程 (km):</strong> ${carDistance}</div>
+                <div><strong>驾车预计时间:</strong> ${carDuration}</div>
+                <div><strong>步行总路程 (m):</strong> ${walkDistance}</div>
+                <div><strong>步行预计时间:</strong> ${walkDuration}</div>
+            `;
+        }
+
+        function initIsochroneLayers() {
+            ['car', 'walk'].forEach(mode => {
+                ISO_LEVELS.forEach(seconds => {
+                    isochroneLayers[mode][seconds] = L.layerGroup();
+                    isochroneState[mode][seconds] = false;
+                });
+            });
+        }
+
+        function getIsochroneStyle(mode, seconds) {
+            const base = ISO_STYLE_BY_LEVEL[seconds] || ISO_STYLE_BY_LEVEL[7200];
+            return {
+                color: base.color,
+                weight: base.weight,
+                fillColor: base.fillColor,
+                fillOpacity: base.fillOpacity,
+                dashArray: mode === 'walk' ? '5, 8' : null
+            };
+        }
+
+        function updateIsoButtonState() {
+            isoTimeButtons.forEach(btn => {
+                const sec = Number(btn.dataset.seconds);
+                const active = Boolean(isochroneState.car[sec] || isochroneState.walk[sec]);
+                btn.classList.toggle('active', active);
+            });
+        }
+
+        function applyIsochroneVisibilityByMode() {
+            const modeEnabled = {
+                car: !!isoModeCar.checked,
+                walk: !!isoModeWalk.checked
+            };
+
+            ['car', 'walk'].forEach(mode => {
+                ISO_LEVELS.forEach(seconds => {
+                    const layer = isochroneLayers[mode][seconds];
+                    if (!layer) {
+                        return;
+                    }
+                    const shouldShow = modeEnabled[mode] && isochroneState[mode][seconds];
+                    if (shouldShow) {
+                        if (!map.hasLayer(layer)) {
+                            map.addLayer(layer);
+                        }
+                    } else if (map.hasLayer(layer)) {
+                        map.removeLayer(layer);
+                    }
+                });
+            });
+        }
+
+        async function loadIsochrone(mode, seconds) {
+            if (!currentLocation) {
+                throw new Error('请先设置虚拟起点，再进行服务区分析');
+            }
+
+            const params = new URLSearchParams({
+                lng: String(currentLocation.lng),
+                lat: String(currentLocation.lat),
+                mode,
+                time_limit: String(seconds)
+            });
+            const res = await fetch(`/api/isochrone?${params.toString()}`);
+            const payload = await parseApiResponse(res, '服务区分析失败');
+
+            const fc = payload && payload.geojson ? payload.geojson : null;
+            if (!fc || fc.type !== 'FeatureCollection') {
+                throw new Error('服务区返回格式错误，需为标准 FeatureCollection');
+            }
+
+            const layer = isochroneLayers[mode][seconds];
+            layer.clearLayers();
+
+            const style = getIsochroneStyle(mode, seconds);
+            const geoLayer = L.geoJSON(fc, {
+                style,
+                onEachFeature: (feature, lyr) => {
+                    const props = feature && feature.properties ? feature.properties : {};
+                    const mins = Math.round((Number(props.time_limit_s) || seconds) / 60);
+                    lyr.bindPopup(`${mode === 'car' ? '驾车' : '步行'}服务区 ${mins} 分钟`);
+                }
+            });
+            layer.addLayer(geoLayer);
+        }
+
+        async function toggleIsochroneSeconds(seconds) {
+            const targetModes = [];
+            if (isoModeCar.checked) {
+                targetModes.push('car');
+            }
+            if (isoModeWalk.checked) {
+                targetModes.push('walk');
+            }
+
+            if (!targetModes.length) {
+                showError('请至少启用一种可达性模式（驾车或步行）。');
+                return;
+            }
+
+            hideError();
+
+            for (const mode of targetModes) {
+                if (isochroneState[mode][seconds]) {
+                    isochroneState[mode][seconds] = false;
+                    isochroneLayers[mode][seconds].clearLayers();
+                    if (map.hasLayer(isochroneLayers[mode][seconds])) {
+                        map.removeLayer(isochroneLayers[mode][seconds]);
+                    }
+                    continue;
+                }
+
+                try {
+                    await loadIsochrone(mode, seconds);
+                    isochroneState[mode][seconds] = true;
+                } catch (err) {
+                    showError(`${mode === 'car' ? '驾车' : '步行'}服务区失败: ${err.message}`);
+                }
+            }
+
+            applyIsochroneVisibilityByMode();
+            updateIsoButtonState();
+        }
+
+        function applyLayerVisibility() {
+            if (toggleCar.checked) {
+                map.addLayer(carRouteLayer);
+            } else {
+                map.removeLayer(carRouteLayer);
+            }
+
+            if (toggleWalk.checked) {
+                map.addLayer(walkRouteLayer);
+            } else {
+                map.removeLayer(walkRouteLayer);
+            }
+        }
+
+        function clearRoutes() {
+            carRouteLayer.clearLayers();
+            walkRouteLayer.clearLayers();
+            updateMetrics(null, null);
+        }
+
+        function extractPointCoordinatesFromGeometry(geometry) {
+            if (!geometry || geometry.type !== 'Point' || !Array.isArray(geometry.coordinates)) {
+                return null;
+            }
+            const [lng, lat] = geometry.coordinates;
+            const nLng = Number(lng);
+            const nLat = Number(lat);
+            if (!Number.isFinite(nLng) || !Number.isFinite(nLat)) {
+                return null;
+            }
+            return { lng: nLng, lat: nLat };
+        }
+
+        function parsePoiPointCoordinates(item) {
+            if (!item || !item.geometry) {
+                return null;
+            }
+            try {
+                const geom = typeof item.geometry === 'string' ? JSON.parse(item.geometry) : item.geometry;
+                return extractPointCoordinatesFromGeometry(geom);
+            } catch (_err) {
+                return null;
+            }
+        }
+
+        function groupByCategory(data) {
+            const grouped = {};
+            (data || []).forEach(item => {
+                const cat = item.category || '未分类';
+                if (!grouped[cat]) {
+                    grouped[cat] = [];
+                }
+                grouped[cat].push(item);
+            });
+            return grouped;
+        }
+
+        function renderNearbySidebar(data) {
+            sidebarRadiusValue.textContent = String(currentRadius);
+
+            if (!data || !data.length) {
+                poiGroupList.className = 'sidebar-empty';
+                poiGroupList.innerHTML = '当前缓冲区内未检索到结果，请调整半径或类别。';
+                return;
+            }
+
+            poiGroupList.className = '';
+            const grouped = groupByCategory(data);
+            const categories = Object.keys(grouped).sort((a, b) => a.localeCompare(b, 'zh-CN'));
+
+            const html = categories.map((cat, idx) => {
+                const visual = categoryStyle(cat);
+                const rows = grouped[cat].map(item => {
+                    const poiPoint = parsePoiPointCoordinates(item);
+                    if (!poiPoint) {
+                        return '';
+                    }
+                    const coords = [poiPoint.lng, poiPoint.lat];
+                    const key = getPoiKey(item, coords);
+                    const d = Number(item.distance_m || 0);
+                    return `
+                        <div class="poi-item" data-poi-key="${key}" data-lat="${poiPoint.lat}" data-lng="${poiPoint.lng}">
+                            <div class="poi-item-main">
+                                <div class="poi-name">${item.name || '未命名地点'}</div>
+                                <div class="poi-meta">距离当前位置 ${Math.round(d)} 米</div>
+                            </div>
+                            <button class="poi-nav-btn" type="button">导航到此</button>
+                        </div>
+                    `;
+                }).join('');
+                return `
+                    <details class="category-group" ${idx === 0 ? 'open' : ''}>
+                        <summary class="category-header">${visual.labelIcon} ${cat}<span class="category-count">${grouped[cat].length}个</span></summary>
+                        ${rows}
+                    </details>
+                `;
+            }).join('');
+
+            poiGroupList.innerHTML = html;
+
+            poiGroupList.querySelectorAll('.poi-item').forEach(el => {
+                const planRouteFromItem = () => {
+                    const key = el.getAttribute('data-poi-key');
+                    const lat = Number(el.getAttribute('data-lat'));
+                    const lng = Number(el.getAttribute('data-lng'));
+                    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+                        return;
+                    }
+                    const ll = L.latLng(lat, lng);
+                    map.flyTo(ll, 16, { duration: 0.8 });
+
+                    const marker = poiMarkerByKey.get(key);
+                    if (!currentLocation) {
+                        showError('请先选择虚拟起点后再进行路线规划。');
+                        if (marker && typeof marker.openPopup === 'function') {
+                            marker.openPopup();
+                        }
+                        return;
+                    }
+
+                    destinationPoi = {
+                        name: '侧栏目标点',
+                        category: '未分类',
+                        geometry: JSON.stringify({ type: 'Point', coordinates: [lng, lat] })
+                    };
+                    requestRoute();
+                };
+
+                const main = el.querySelector('.poi-item-main');
+                if (main) {
+                    main.addEventListener('click', planRouteFromItem);
+                }
+
+                const navBtn = el.querySelector('.poi-nav-btn');
+                if (navBtn) {
+                    navBtn.addEventListener('click', evt => {
+                        evt.stopPropagation();
+                        planRouteFromItem();
+                    });
+                }
+
+                el.addEventListener('dblclick', planRouteFromItem);
+                });
+        }
+
+        function drawCarRoute(payload) {
+            carRouteLayer.clearLayers();
+            if (!payload || !payload.geojson) {
+                return;
+            }
+
+            const layer = L.geoJSON(payload.geojson, {
+                style: feature => {
+                    const segmentType = feature && feature.properties ? feature.properties.segment_type : 'car';
+                    const trafficFactor = feature && feature.properties ? feature.properties.traffic_factor : 1.0;
+                    const color = trafficColorByFactor(trafficFactor);
+                    if (segmentType === 'walk') {
+                        return {
+                            color,
+                            weight: 6,
+                            opacity: 0.95,
+                            dashArray: '8 6'
+                        };
+                    }
+                    return {
+                        color,
+                        weight: 7,
+                        opacity: 0.95
+                    };
+                }
+            });
+            carRouteLayer.addLayer(layer);
+        }
+
+        function drawWalkRoute(payload) {
+            walkRouteLayer.clearLayers();
+            if (!payload || !payload.geojson) {
+                return;
+            }
+
+            const layer = L.geoJSON(payload.geojson, {
+                style: feature => {
+                    const trafficFactor = feature && feature.properties ? feature.properties.traffic_factor : 1.0;
+                    return {
+                        color: trafficColorByFactor(trafficFactor),
+                        weight: 6,
+                        opacity: 0.8,
+                        dashArray: '5, 10'
+                    };
+                }
+            });
+            walkRouteLayer.addLayer(layer);
+
+            const footprintFeatures = [];
+            const seen = new Set();
+
+            (payload.geojson.features || []).forEach(feature => {
+                const geom = feature && feature.geometry ? feature.geometry : null;
+                if (!geom || geom.type !== 'LineString' || !Array.isArray(geom.coordinates)) {
+                    return;
+                }
+
+                const coords = geom.coordinates;
+                if (coords.length < 2) {
+                    return;
+                }
+
+                const addPointFeature = (coord, kind) => {
+                    if (!Array.isArray(coord) || coord.length < 2) {
+                        return;
+                    }
+                    const lng = Number(coord[0]);
+                    const lat = Number(coord[1]);
+                    if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+                        return;
+                    }
+                    const key = `${lng.toFixed(6)}|${lat.toFixed(6)}`;
+                    if (seen.has(key)) {
+                        return;
+                    }
+                    seen.add(key);
+                    footprintFeatures.push({
+                        type: 'Feature',
+                        properties: { kind },
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [lng, lat]
+                        }
+                    });
+                };
+
+                addPointFeature(coords[0], 'start');
+                addPointFeature(coords[coords.length - 1], 'end');
+
+                for (let i = 1; i < coords.length - 1; i += 1) {
+                    const a = coords[i - 1];
+                    const b = coords[i];
+                    const c = coords[i + 1];
+                    if (!a || !b || !c) {
+                        continue;
+                    }
+
+                    const v1x = Number(b[0]) - Number(a[0]);
+                    const v1y = Number(b[1]) - Number(a[1]);
+                    const v2x = Number(c[0]) - Number(b[0]);
+                    const v2y = Number(c[1]) - Number(b[1]);
+                    const m1 = Math.hypot(v1x, v1y);
+                    const m2 = Math.hypot(v2x, v2y);
+                    if (!m1 || !m2) {
+                        continue;
+                    }
+                    const cosValue = Math.max(-1, Math.min(1, (v1x * v2x + v1y * v2y) / (m1 * m2)));
+                    const angleDeg = Math.acos(cosValue) * 180 / Math.PI;
+                    if (angleDeg >= 30) {
+                        addPointFeature(b, 'turn');
+                    }
+                }
+            });
+
+            if (footprintFeatures.length) {
+                const footprintLayer = L.geoJSON(
+                    { type: 'FeatureCollection', features: footprintFeatures },
+                    {
+                        pointToLayer: (_feature, latlng) => {
+                            return L.marker(latlng, {
+                                icon: L.divIcon({
+                                    className: '',
+                                    html: '<div class="footstep-marker">👣</div>',
+                                    iconSize: [24, 24],
+                                    iconAnchor: [12, 12]
+                                })
+                            });
+                        }
+                    }
+                );
+                walkRouteLayer.addLayer(footprintLayer);
+            }
+        }
+
+        function fitRouteBounds() {
+            const fg = L.featureGroup();
+            if (carRouteLayer.getLayers().length) {
+                fg.addLayer(carRouteLayer);
+            }
+            if (walkRouteLayer.getLayers().length) {
+                fg.addLayer(walkRouteLayer);
+            }
+            if (fg.getLayers().length) {
+                map.fitBounds(fg.getBounds(), { padding: [40, 40], maxZoom: 16 });
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const res = await fetch('/api/categories');
+                const payload = await parseApiResponse(res, '分类加载失败');
+
+                const categorySet = new Set(['休闲服务', '教育科研', '医疗卫生']);
+                (payload.data || []).forEach(c => categorySet.add(c));
+
+                categorySelect.innerHTML = '<option value="">全部类型</option>';
+                Array.from(categorySet)
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b, 'zh-CN'))
+                    .forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category;
+                        option.textContent = category;
+                        categorySelect.appendChild(option);
+                    });
+            } catch (err) {
+                showError(`无法加载分类: ${err.message}`);
+            }
+        }
+
+        function renderResults(data) {
+            resultLayer.clearLayers();
+            poiMarkerByKey = new Map();
+            const bounds = [];
+
+            data.forEach(item => {
+                const poiPoint = parsePoiPointCoordinates(item);
+                if (!poiPoint) return;
+                const coords = [poiPoint.lng, poiPoint.lat];
+                const latlng = [coords[1], coords[0]];
+                bounds.push(latlng);
+
+                const visual = categoryStyle(item.category || '');
+                const marker = L.marker(latlng, {
+                    icon: L.divIcon({
+                        className: 'poi-icon-wrap',
+                        html: `<div class="poi-pin ${visual.key}">${visual.icon}</div>`,
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
+                    })
+                })
+                    .addTo(resultLayer)
+                    .bindPopup(
+                        `<b>${item.name || '未命名地点'}</b><br>类型: ${item.category || '未知'}${typeof item.distance_m === 'number' ? `<br>距离: ${Math.round(item.distance_m)} 米` : ''}`
+                        + `<br><button class="to-here-btn" onclick="to_here(${coords[1]}, ${coords[0]})">导航到这里</button>`
+                    )
+                    .on('click', () => {
+                        destinationPoi = item;
+                        if (!currentLocation) {
+                            showError('请先选择虚拟地点，再点击地点进行导航。');
+                            return;
+                        }
+                        requestRoute();
+                    });
+
+                    const key = getPoiKey(item, coords);
+                    poiMarkerByKey.set(key, marker);
+            });
+
+            if (bounds.length) {
+                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 16 });
+            }
+        }
+
+        function renderSearchResults(data) {
+            searchResultsEl.innerHTML = '';
+            if (!data.length) {
+                searchResultsEl.classList.remove('show');
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${item.name || '未命名地点'}</strong><span>${item.category || '未知类型'}</span>`;
+                li.addEventListener('click', () => {
+                    focusOnResult(index);
+                    searchResultsEl.classList.remove('show');
+                });
+                searchResultsEl.appendChild(li);
+            });
+
+            searchResultsEl.classList.add('show');
+        }
+
+        function focusOnResult(index) {
+            const item = currentResults[index];
+            const poiPoint = parsePoiPointCoordinates(item);
+            if (!item || !poiPoint) return;
+
+            destinationPoi = item;
+            const latlng = [poiPoint.lat, poiPoint.lng];
+            map.setView(latlng, 16, { animate: true });
+
+            if (currentLocation) {
+                requestRoute();
+            }
+        }
+
+        async function searchPlaces() {
+            const keyword = searchInput.value.trim();
+            if (!keyword) {
+                searchResultsEl.classList.remove('show');
+                return;
+            }
+
+            try {
+                hideError();
+                const params = new URLSearchParams({ keyword, limit: '30' });
+                if (categorySelect.value) {
+                    params.set('category', categorySelect.value);
+                }
+
+                const res = await fetch(`/api/search?${params.toString()}`);
+                const payload = await parseApiResponse(res, '地点搜索失败');
+                currentResults = payload.data || [];
+                renderResults(currentResults);
+                renderSearchResults(currentResults);
+            } catch (err) {
+                showError(`搜索失败: ${err.message}`);
+            }
+        }
+
+        async function updateNearbySearch() {
+            if (!currentLocation) {
+                return;
+            }
+
+            const radius = Math.max(100, Math.min(20000, Number(radiusInput.value) || 2000));
+            radiusInput.value = radius;
+            currentRadius = radius;
+            sidebarRadiusValue.textContent = String(currentRadius);
+
+            try {
+                hideError();
+                const params = new URLSearchParams({
+                    lng: String(currentLocation.lng),
+                    lat: String(currentLocation.lat),
+                    radius: String(radius),
+                    limit: '200'
+                });
+                if (categorySelect.value) {
+                    params.set('category', categorySelect.value);
+                }
+
+                const res = await fetch(`/api/nearby?${params.toString()}`);
+                const payload = await parseApiResponse(res, '附近地点检索失败');
+                currentResults = payload.data || [];
+                renderResults(currentResults);
+                renderNearbySidebar(currentResults);
+            } catch (err) {
+                showError(`附近地点检索失败: ${err.message}`);
+            }
+        }
+
+        const debouncedNearbySearch = debounce(updateNearbySearch, 320);
+
+        function setCurrentLocation(latlng, popupText = '已设置为虚拟当前位置') {
+            currentLocation = { lat: latlng.lat, lng: latlng.lng };
+
+            userMarker.clearLayers();
+            const currentMarker = L.marker(latlng, {
+                icon: L.divIcon({ className: 'user-icon', html: '📍', iconSize: [28, 28] })
+            })
+                .addTo(userMarker)
+                .bindPopup(popupText)
+                .openPopup();
+
+            setTimeout(() => {
+                if (currentMarker && typeof currentMarker.closePopup === 'function') {
+                    currentMarker.closePopup();
+                }
+            }, 5000);
+
+            updateNearbySearch();
+            if (destinationPoi) {
+                requestRoute();
+            }
+        }
+
+        function getAnalyzeCategories() {
+            if (categorySelect.value) {
+                return [categorySelect.value];
+            }
+            return Array.from(categorySelect.options)
+                .map(option => option.value)
+                .filter(Boolean);
+        }
+
+        async function analyzeGeo(geojson, type) {
+            try {
+                hideError();
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        geojson,
+                        type,
+                        categories: getAnalyzeCategories()
+                    })
+                });
+                const payload = await parseApiResponse(response, '空间分析失败');
+                currentResults = payload.data || [];
+                renderResults(currentResults);
+                renderSearchResults(currentResults);
+            } catch (err) {
+                showError(`空间分析失败: ${err.message}`);
+            }
+        }
+
+        async function requestRoute() {
+            if (!currentLocation || !destinationPoi) {
+                return;
+            }
+
+            try {
+                hideError();
+                const poiPoint = parsePoiPointCoordinates(destinationPoi);
+                if (!poiPoint) {
+                    throw new Error('终点坐标无效，请重新选择 POI 点位');
+                }
+                const baseParams = {
+                    origin_lng: String(currentLocation.lng),
+                    origin_lat: String(currentLocation.lat),
+                    dest_lng: String(poiPoint.lng),
+                    dest_lat: String(poiPoint.lat)
+                };
+
+                const carParams = new URLSearchParams({ ...baseParams, mode: 'car' });
+                const walkParams = new URLSearchParams({ ...baseParams, mode: 'walk' });
+
+                const [carResult, walkResult] = await Promise.allSettled([
+                    fetch(`/api/route_shortest?${carParams.toString()}`),
+                    fetch(`/api/route_shortest?${walkParams.toString()}`)
+                ]);
+
+                let carPayload = null;
+                let walkPayload = null;
+                const errors = [];
+
+                if (carResult.status === 'fulfilled') {
+                    try {
+                        carPayload = await parseApiResponse(carResult.value, '驾车路径规划失败');
+                    } catch (err) {
+                        errors.push(`驾车: ${err.message}`);
+                    }
+                } else {
+                    errors.push(`驾车: ${carResult.reason && carResult.reason.message ? carResult.reason.message : '请求失败'}`);
+                }
+
+                if (walkResult.status === 'fulfilled') {
+                    try {
+                        walkPayload = await parseApiResponse(walkResult.value, '步行路径规划失败');
+                    } catch (err) {
+                        errors.push(`步行: ${err.message}`);
+                    }
+                } else {
+                    errors.push(`步行: ${walkResult.reason && walkResult.reason.message ? walkResult.reason.message : '请求失败'}`);
+                }
+
+                if (!carPayload && !walkPayload) {
+                    throw new Error(errors.join('；') || '路径规划失败');
+                }
+
+                drawCarRoute(carPayload);
+                drawWalkRoute(walkPayload);
+                applyLayerVisibility();
+                updateMetrics(carPayload, walkPayload);
+                fitRouteBounds();
+
+                if (errors.length) {
+                    showError(`部分模式规划失败: ${errors.join('；')}`);
+                }
+            } catch (err) {
+                showError(`路径规划失败: ${err.message}`);
+            }
+        }
+
+        const drawControl = new L.Control.Draw({
+            draw: {
+                polygon: true,
+                rectangle: true,
+                circle: false,
+                marker: false,
+                circlemarker: false,
+                polyline: false
+            },
+            edit: { featureGroup: drawnItems }
+        });
+        map.addControl(drawControl);
+
+        map.on('click', function(e) {
+            if (!isPickingVirtualLocation) {
+                return;
+            }
+            hideError();
+            setCurrentLocation(e.latlng);
+            isPickingVirtualLocation = false;
+            locateBtn.textContent = '点击选择虚拟地点';
+        });
+
+        map.on(L.Draw.Event.CREATED, function(event) {
+            drawnItems.clearLayers();
+            drawnItems.addLayer(event.layer);
+            analyzeGeo(event.layer.toGeoJSON(), 'polygon');
+        });
+
+        searchInput.addEventListener('input', () => {
+            if (!searchInput.value.trim()) {
+                searchResultsEl.classList.remove('show');
+                return;
+            }
+            searchPlaces();
+        });
+
+        searchInput.addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                searchPlaces();
+            }
+        });
+
+        searchBtn.addEventListener('click', searchPlaces);
+
+        categorySelect.addEventListener('change', () => {
+            if (currentLocation) {
+                updateNearbySearch();
+            }
+            if (searchInput.value.trim()) {
+                searchPlaces();
+            }
+        });
+
+        locateBtn.addEventListener('click', () => {
+            isPickingVirtualLocation = !isPickingVirtualLocation;
+            if (isPickingVirtualLocation) {
+                locateBtn.textContent = '请点击地图设置位置';
+                showError('请在地图上点击一个点，作为虚拟当前位置。');
+            } else {
+                locateBtn.textContent = '点击选择虚拟地点';
+                hideError();
+            }
+        });
+
+        radiusInput.addEventListener('input', () => {
+            if (currentLocation) {
+                debouncedNearbySearch();
+            }
+        });
+
+        radiusInput.addEventListener('change', () => {
+            if (currentLocation) {
+                updateNearbySearch();
+            }
+        });
+
+        clearRouteBtn.addEventListener('click', () => {
+            clearRoutes();
+            destinationPoi = null;
+        });
+
+        toggleCar.addEventListener('change', applyLayerVisibility);
+        toggleWalk.addEventListener('change', applyLayerVisibility);
+
+        isoModeCar.addEventListener('change', () => {
+            if (isoModeCar.checked && isoModeWalk.checked) {
+                isoModeWalk.checked = false;
+            }
+            applyIsochroneVisibilityByMode();
+            updateIsoButtonState();
+        });
+
+        isoModeWalk.addEventListener('change', () => {
+            if (isoModeWalk.checked && isoModeCar.checked) {
+                isoModeCar.checked = false;
+            }
+            applyIsochroneVisibilityByMode();
+            updateIsoButtonState();
+        });
+
+        isoTimeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const seconds = Number(btn.dataset.seconds);
+                if (!ISO_LEVELS.includes(seconds)) {
+                    return;
+                }
+                toggleIsochroneSeconds(seconds);
+            });
+        });
+
+        helpBtn.addEventListener('click', () => {
+            helpModal.classList.add('show');
+        });
+
+        closeHelpBtn.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        closeHelpBtnTop.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        helpModal.addEventListener('click', event => {
+            if (event.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
+
+        document.addEventListener('click', event => {
+            if (!event.target.closest('.search-wrap')) {
+                searchResultsEl.classList.remove('show');
+            }
+        });
+
+        map.on('draw:created', clearRoutes);
+
+        initIsochroneLayers();
+        loadCategories();
+        applyLayerVisibility();
+        applyIsochroneVisibilityByMode();
+        updateIsoButtonState();
+    </script>
+</body>
+</html>
+
+============================================================
+
+
+# 完成，共 3 个文件
